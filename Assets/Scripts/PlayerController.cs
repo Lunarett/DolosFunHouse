@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
 
     private Renderer _selectionRenderer;
     private Transform _selection;
-    private float _maxInsteractDistance = 2f;
+    [SerializeField]  private float _maxInsteractDistance = 2f;
 
     //[SerializeField] private UIHandler _UIHandler;
 
@@ -35,12 +35,12 @@ public class PlayerController : MonoBehaviour
                         ApplyHighlight(hit);
                     }
 
-                    //ButtonScript button;
-                    /*
-                    if (((button = _selection.GetComponent<ButtonScript>()) != null) && Input.GetKeyDown(KeyCode.E))
+                    Interactible interactible;
+                    
+                    if (((interactible = _selection.GetComponent<Interactible>()) != null) && Input.GetKeyDown(KeyCode.E))
                     {
-                        button.PressButton();
-                    }*/
+                        interactible .Interact();
+                    }
                 }
 
                 else
