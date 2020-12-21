@@ -4,141 +4,141 @@ using UnityEngine;
 
 namespace Michsky.UI.Dark
 {
-    public class MainPanelManager : MonoBehaviour
-    {
-        [Header("PANEL LIST")]
-        public List<GameObject> panels = new List<GameObject>();
+	public class MainPanelManager : MonoBehaviour
+	{
+		[Header("PANEL LIST")]
+		public List<GameObject> panels = new List<GameObject>();
 
-        [Header("RESOURCES")]
-        public BlurManager homeBlurManager;
+		[Header("RESOURCES")]
+		public BlurManager homeBlurManager;
 
-        [Header("SETTINGS")]
-        public int currentPanelIndex = 0;
-        public bool enableBrushAnimation = true;
-        public bool enableHomeBlur = true;
-         
-        private GameObject currentPanel;
-        private GameObject nextPanel;
-        private Animator currentPanelAnimator;
-        private Animator nextPanelAnimator;
+		[Header("SETTINGS")]
+		public int currentPanelIndex = 0;
+		public bool enableBrushAnimation = true;
+		public bool enableHomeBlur = true;
 
-        string panelFadeIn = "Panel In";
-        string panelFadeOut = "Panel Out";
+		private GameObject currentPanel;
+		private GameObject nextPanel;
+		private Animator currentPanelAnimator;
+		private Animator nextPanelAnimator;
 
-        PanelBrushManager currentBrush;
-        PanelBrushManager nextBrush;
+		string panelFadeIn = "Panel In";
+		string panelFadeOut = "Panel Out";
 
-        void Start()
-        {
-            currentPanel = panels[currentPanelIndex];
-            currentPanelAnimator = currentPanel.GetComponent<Animator>();
-            currentPanelAnimator.Play(panelFadeIn);
+		PanelBrushManager currentBrush;
+		PanelBrushManager nextBrush;
 
-            if (enableHomeBlur == true)
-                homeBlurManager.BlurInAnim();
-        }
+		void Start()
+		{
+			currentPanel = panels[currentPanelIndex];
+			currentPanelAnimator = currentPanel.GetComponent<Animator>();
+			currentPanelAnimator.Play(panelFadeIn);
 
-        public void OpenFirstTab()
-        {
-            currentPanel = panels[currentPanelIndex];
-            currentPanelAnimator = currentPanel.GetComponent<Animator>();
-            currentPanelAnimator.Play(panelFadeIn);
+			if (enableHomeBlur == true)
+				homeBlurManager.BlurInAnim();
+		}
 
-            if (enableHomeBlur == true)
-                homeBlurManager.BlurInAnim();
-        }
+		public void OpenFirstTab()
+		{
+			currentPanel = panels[currentPanelIndex];
+			currentPanelAnimator = currentPanel.GetComponent<Animator>();
+			currentPanelAnimator.Play(panelFadeIn);
 
-        public void PanelAnim(int newPanel)
-        {
-            if (newPanel != currentPanelIndex)
-            {
-                currentPanel = panels[currentPanelIndex];
+			if (enableHomeBlur == true)
+				homeBlurManager.BlurInAnim();
+		}
 
-                currentPanelIndex = newPanel;
-                nextPanel = panels[currentPanelIndex];
+		public void PanelAnim(int newPanel)
+		{
+			if (newPanel != currentPanelIndex)
+			{
+				currentPanel = panels[currentPanelIndex];
 
-                currentPanelAnimator = currentPanel.GetComponent<Animator>();
-                nextPanelAnimator = nextPanel.GetComponent<Animator>();
-                currentPanelAnimator.Play(panelFadeOut);
-                nextPanelAnimator.Play(panelFadeIn);
+				currentPanelIndex = newPanel;
+				nextPanel = panels[currentPanelIndex];
 
-                if (enableBrushAnimation == true)
-                {
-                    currentBrush = currentPanel.GetComponent<PanelBrushManager>();
-                    if (currentBrush.brushAnimator != null)
-                        currentBrush.BrushSplashOut();
-                    nextBrush = nextPanel.GetComponent<PanelBrushManager>();
-                    if (nextBrush.brushAnimator != null)
-                        nextBrush.BrushSplashIn();
-                }
+				currentPanelAnimator = currentPanel.GetComponent<Animator>();
+				nextPanelAnimator = nextPanel.GetComponent<Animator>();
+				currentPanelAnimator.Play(panelFadeOut);
+				nextPanelAnimator.Play(panelFadeIn);
 
-                if (currentPanelIndex == 0 && enableHomeBlur == true)
-                    homeBlurManager.BlurInAnim();
-                else if (currentPanelIndex != 0 && enableHomeBlur == true)
-                    homeBlurManager.BlurOutAnim();
-            }
-        }
+				if (enableBrushAnimation == true)
+				{
+					currentBrush = currentPanel.GetComponent<PanelBrushManager>();
+					if (currentBrush.brushAnimator != null)
+						currentBrush.BrushSplashOut();
+					nextBrush = nextPanel.GetComponent<PanelBrushManager>();
+					if (nextBrush.brushAnimator != null)
+						nextBrush.BrushSplashIn();
+				}
 
-        public void NextPage()
-        {
-            if (currentPanelIndex <= panels.Count - 2)
-            {
-                currentPanel = panels[currentPanelIndex];
-                currentPanelAnimator = currentPanel.GetComponent<Animator>();
-                currentPanelAnimator.Play(panelFadeOut);
+				if (currentPanelIndex == 0 && enableHomeBlur == true)
+					homeBlurManager.BlurInAnim();
+				else if (currentPanelIndex != 0 && enableHomeBlur == true)
+					homeBlurManager.BlurOutAnim();
+			}
+		}
 
-                currentPanelIndex += 1;
-                nextPanel = panels[currentPanelIndex];
+		public void NextPage()
+		{
+			if (currentPanelIndex <= panels.Count - 2)
+			{
+				currentPanel = panels[currentPanelIndex];
+				currentPanelAnimator = currentPanel.GetComponent<Animator>();
+				currentPanelAnimator.Play(panelFadeOut);
 
-                nextPanelAnimator = nextPanel.GetComponent<Animator>();
-                nextPanelAnimator.Play(panelFadeIn);
+				currentPanelIndex += 1;
+				nextPanel = panels[currentPanelIndex];
 
-                if (enableBrushAnimation == true)
-                {
-                    currentBrush = currentPanel.GetComponent<PanelBrushManager>();
-                    if (currentBrush.brushAnimator != null)
-                        currentBrush.BrushSplashOut();
-                    nextBrush = nextPanel.GetComponent<PanelBrushManager>();
-                    if (nextBrush.brushAnimator != null)
-                        nextBrush.BrushSplashIn();
-                }
+				nextPanelAnimator = nextPanel.GetComponent<Animator>();
+				nextPanelAnimator.Play(panelFadeIn);
 
-                if (currentPanelIndex == 0 && enableHomeBlur == true)
-                    homeBlurManager.BlurInAnim();
-                else if (currentPanelIndex != 0 && enableHomeBlur == true)
-                    homeBlurManager.BlurOutAnim();
-            }
-        }
+				if (enableBrushAnimation == true)
+				{
+					currentBrush = currentPanel.GetComponent<PanelBrushManager>();
+					if (currentBrush.brushAnimator != null)
+						currentBrush.BrushSplashOut();
+					nextBrush = nextPanel.GetComponent<PanelBrushManager>();
+					if (nextBrush.brushAnimator != null)
+						nextBrush.BrushSplashIn();
+				}
 
-        public void PrevPage()
-        {
-            if (currentPanelIndex >= 1)
-            {
-                currentPanel = panels[currentPanelIndex];
-                currentPanelAnimator = currentPanel.GetComponent<Animator>();
-                currentPanelAnimator.Play(panelFadeOut);
+				if (currentPanelIndex == 0 && enableHomeBlur == true)
+					homeBlurManager.BlurInAnim();
+				else if (currentPanelIndex != 0 && enableHomeBlur == true)
+					homeBlurManager.BlurOutAnim();
+			}
+		}
 
-                currentPanelIndex -= 1;
-                nextPanel = panels[currentPanelIndex];
+		public void PrevPage()
+		{
+			if (currentPanelIndex >= 1)
+			{
+				currentPanel = panels[currentPanelIndex];
+				currentPanelAnimator = currentPanel.GetComponent<Animator>();
+				currentPanelAnimator.Play(panelFadeOut);
 
-                nextPanelAnimator = nextPanel.GetComponent<Animator>();
-                nextPanelAnimator.Play(panelFadeIn);
+				currentPanelIndex -= 1;
+				nextPanel = panels[currentPanelIndex];
 
-                if (enableBrushAnimation == true)
-                {
-                    currentBrush = currentPanel.GetComponent<PanelBrushManager>();
-                    if (currentBrush.brushAnimator != null)
-                        currentBrush.BrushSplashOut();
-                    nextBrush = nextPanel.GetComponent<PanelBrushManager>();
-                    if (nextBrush.brushAnimator != null)
-                        nextBrush.BrushSplashIn();
-                }
+				nextPanelAnimator = nextPanel.GetComponent<Animator>();
+				nextPanelAnimator.Play(panelFadeIn);
 
-                if (currentPanelIndex == 0 && enableHomeBlur == true)
-                    homeBlurManager.BlurInAnim();
-                else if (currentPanelIndex != 0 && enableHomeBlur == true)
-                    homeBlurManager.BlurOutAnim();
-            }
-        }
-    }
+				if (enableBrushAnimation == true)
+				{
+					currentBrush = currentPanel.GetComponent<PanelBrushManager>();
+					if (currentBrush.brushAnimator != null)
+						currentBrush.BrushSplashOut();
+					nextBrush = nextPanel.GetComponent<PanelBrushManager>();
+					if (nextBrush.brushAnimator != null)
+						nextBrush.BrushSplashIn();
+				}
+
+				if (currentPanelIndex == 0 && enableHomeBlur == true)
+					homeBlurManager.BlurInAnim();
+				else if (currentPanelIndex != 0 && enableHomeBlur == true)
+					homeBlurManager.BlurOutAnim();
+			}
+		}
+	}
 }
