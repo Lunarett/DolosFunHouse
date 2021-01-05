@@ -12,9 +12,9 @@ public class Objective : Interactible
         _audioSource = gameObject.GetComponent<AudioSource>();
     }
 
-    public override void Interact()
+    public override void Interact(GameObject playerObject)
     {
-        base.Interact();
+        base.Interact(playerObject);
 
         //CALL MINI GAME UI
 
