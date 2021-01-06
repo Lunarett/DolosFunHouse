@@ -754,5 +754,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Barrel
       objectReference: {fileID: 0}
+    - target: {fileID: 1344691092761532349, guid: 9c2a48269a49cb04da4ad84d24b7795b, type: 3}
+      propertyPath: _lookAngle
+      value: 40
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c2a48269a49cb04da4ad84d24b7795b, type: 3}
