@@ -5,31 +5,54 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [SerializeField] private float _mouseSensitivity = 100f;
-
-    [SerializeField] private Transform _playerTransform;
+    [SerializeField] private float _xRotClamp = 90f;
+    [SerializeField] private Transform _followTarget;
 
     private float _xRotation = 0f;
+    private float _yRotation = 0f;
+    public float rotationPower = 3f;
+    public float rotationLerp = 0.5f;
 
-    // Start is called before the first frame update
-    void Start()
+    //input
+    private InputMap _inputMap;
+
+    public void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Awake()
     {
-        FollowMouse();
+        InitInput();
     }
 
-    private void FollowMouse()
+    private void InitInput()
     {
-        float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity * Time.deltaTime;
+        _inputMap = new InputMap();
+        _inputMap.Player.Look.performed += context => FollowMouse(context.ReadValue<Vector2>());
+    }
 
-        _xRotation = Mathf.Clamp(_xRotation - mouseY, -90f, 90f);
+    private void FollowMouse(Vector2 mouseInput)
+    {
+        //we receive a Vector 2 where x is the horizontal and y the vertical movement of the mouse over time (delta)
+        float moveX = mouseInput.x * _mouseSensitivity * Time.deltaTime;
+        float moveY = mouseInput.y * _mouseSensitivity * Time.deltaTime;
 
-        transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
-        _playerTransform.Rotate(Vector3.up * mouseX);
+
+        _xRotation = _xRotation + moveX;
+        _yRotation = Mathf.Clamp(_yRotation + moveY, -_xRotClamp, _xRotClamp);
+
+        _followTarget.gameObject.transform.Rotate(Vector3.up * _yRotation * Time.deltaTime);
+        _followTarget.gameObject.transform.localRotation = Quaternion.Euler(_yRotation, _xRotation, 0f);
+    }
+
+    public void OnEnable()
+    {
+        _inputMap.Enable();
+    }
+
+    public void OnDisable()
+    {
+        _inputMap.Disable();
     }
 }

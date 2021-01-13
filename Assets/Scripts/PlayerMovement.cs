@@ -1,22 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    //based on this tutorial https://www.youtube.com/watch?v=_QajrabyTJc&ab_channel=Brackeys
-
     [SerializeField] private CharacterController controller;
 
-    //movement
+    //input map
+    private InputMap _inputMap;
 
+    //movement
     [SerializeField] private float _movementSpeed = 12f;
     [SerializeField] private float _jumpHeight = 2f;
 
     //gravity
-
     private Vector3 _gravity = Physics.gravity;
-
     private Vector3 _velocity;
 
     //ground check
@@ -26,7 +23,29 @@ public class PlayerMovement : MonoBehaviour
     private float _groundDistance = 0.1f;
     private bool _isGrounded;
 
+    //moving camera
+    [SerializeField] private float _mouseSensitivity = 100f;
+    private float _xRotation = 0f;
+    private Vector2 _look;
+
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     public void Update()
+    {
+        Move();
+        //FollowMouse();
+    }
+
+    private void InitInput()
+    {
+        _inputMap = new InputMap();
+        _inputMap.Player.Movement.performed += context => Move();
+    }
+
+    private void Move()
     {
         if (controller.enabled)
         {
