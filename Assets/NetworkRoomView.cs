@@ -6,10 +6,8 @@ using TMPro;
 public class NetworkRoomView : MonoBehaviourPunCallbacks
 {
 	[SerializeField] GameObject _playerButtonPrefab;
-	[SerializeField] TMP_InputField _nickname;
 
-	
-	private void RefreshRoomList()
+	public void RefreshRoomList()
 	{
 		for (int i = transform.childCount - 1; i >= 0; i--)
 		{
@@ -18,10 +16,10 @@ public class NetworkRoomView : MonoBehaviourPunCallbacks
 
 		if(PhotonNetwork.InRoom)
 		{
-			foreach (var player in PhotonNetwork.CurrentRoom.Players)
+			foreach (var player in PhotonNetwork.PlayerList)
 			{
 				GameObject obj = Instantiate(_playerButtonPrefab, transform);
-				obj.GetComponent<NetworkRoomPlayerView>().Setup(player.Value, _nickname);
+				obj.GetComponent<NetworkRoomPlayerView>().Setup(player);
 			}
 		}
 	}
@@ -46,3 +44,15 @@ public class NetworkRoomView : MonoBehaviourPunCallbacks
 		RefreshRoomList();
 	}
 }
+//	// CreateLobby
+//	foreach (var player in PhotonNetwork.CurrentRoom.Players)
+//	{
+//		if (player.Value.IsLocal)
+//		{
+//			player.Value.NickName = _inputPlayerNameCreate.text;
+//		}
+//		Debug.Log(player.Value.NickName);
+//
+//		GameObject obj = Instantiate(_playerButtonPrefab, transform);
+//		obj.GetComponent<NetworkRoomPlayerView>().Setup(player.Value, _inputPlayerNameCreate.text);
+//	}
