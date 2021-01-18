@@ -34,6 +34,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	private void Start()
 	{
 		PhotonNetwork.ConnectUsingSettings();
+
+		byte mp;
+
+		if (byte.TryParse(_maxPlayers.text, out mp))
+			_options.MaxPlayers = mp;
 	}
 
 	public override void OnConnectedToMaster()
@@ -81,7 +86,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 		if(byte.TryParse(_maxPlayers.text, out result))
 		{
-			Debug.Log(result);
 			_options.MaxPlayers = result;
 		}
 
@@ -166,9 +170,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
-		_description.text = ErrorMsg.Instance.DisconnectCauses(cause);
+		if(_description != null)
+			_description.text = ErrorMsg.Instance.DisconnectCauses(cause);
 		OpenErrorMessage.Invoke();
-		RetryConnection();
+
+		if(PhotonNetwork.LocalPlayer != null)
+			RetryConnection();
 	}
 
 	private void OnGUI()
