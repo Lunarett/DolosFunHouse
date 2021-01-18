@@ -8,17 +8,13 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float _xRotClamp = 90f;
     [SerializeField] private Transform _followTarget;
 
-    private float _xRotation = 0f;
-    private float _yRotation = 0f;
-    public float rotationPower = 3f;
-    public float rotationLerp = 0.5f;
-
     //input
     private InputMap _inputMap;
 
     public void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void Awake()
@@ -34,16 +30,15 @@ public class CameraController : MonoBehaviour
 
     private void FollowMouse(Vector2 mouseInput)
     {
-        //we receive a Vector 2 where x is the horizontal and y the vertical movement of the mouse over time (delta)
+        //we receive a Vector2 where x is the horizontal and y the vertical movement of the mouse over time (delta)
         float moveX = mouseInput.x * _mouseSensitivity * Time.deltaTime;
-        float moveY = mouseInput.y * _mouseSensitivity * Time.deltaTime;
+        float moveY = -mouseInput.y * _mouseSensitivity * Time.deltaTime;
 
+        Vector3 rotation = _followTarget.eulerAngles + new Vector3(moveY, moveX, 0f);
 
-        _xRotation = _xRotation + moveX;
-        _yRotation = Mathf.Clamp(_yRotation + moveY, -_xRotClamp, _xRotClamp);
+        rotation.x = ClampAngle(rotation.x, -_xRotClamp, _xRotClamp);
 
-        _followTarget.gameObject.transform.Rotate(Vector3.up * _yRotation * Time.deltaTime);
-        _followTarget.gameObject.transform.localRotation = Quaternion.Euler(_yRotation, _xRotation, 0f);
+        _followTarget.eulerAngles = rotation;
     }
 
     public void OnEnable()
@@ -54,5 +49,21 @@ public class CameraController : MonoBehaviour
     public void OnDisable()
     {
         _inputMap.Disable();
+    }
+
+    //source: https://answers.unity.com/questions/659932/how-do-i-clamp-my-rotation.html
+    float ClampAngle(float angle, float from, float to)
+    {
+        if (angle < 0f)
+        {
+            angle += 360;
+        }
+
+        if (angle > 180f)
+        {
+            return Mathf.Max(angle, 360 + from);
+        }
+
+        return Mathf.Min(angle, to);
     }
 }

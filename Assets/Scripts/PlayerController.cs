@@ -12,19 +12,20 @@ public class PlayerController : MonoBehaviour
     private Transform _selection;
     [SerializeField] private float _maxInsteractDistance = 2f;
 
-    //camera control
+    //camera
     [SerializeField] Camera _playerCam;
+    [SerializeField] Transform _followTransform;
+
 
     //character controller
     private CharacterController controller;
-    
 
     //input
     private InputMap _inputMap;
 
     //movement
     [SerializeField] private float _movementSpeed = 12f;
-    [SerializeField] private float _jumpHeight = 2f;
+    [SerializeField] private float _jumpHeight = 10f;
     private bool _isMoving = false;
 
     //gravity
@@ -35,8 +36,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundMask;
     private float _groundDistance = 0.1f;
-    private bool _isGrounded;
-    
+    private bool _isGrounded = false;
+
 
     private void Awake()
     {
@@ -45,60 +46,46 @@ public class PlayerController : MonoBehaviour
         InitInput();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         #region Interaction
+
+        RemoveHighlight();
+
         if (_playerCam.gameObject.activeSelf)
         {
-            //object selection based on this https://www.youtube.com/watch?v=_yf5vzZ2sYE&ab_channel=InfallibleCode
             Ray ray = new Ray(transform.position, _playerCam.transform.forward * _maxInsteractDistance);
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                if (hit.distance <= _maxInsteractDistance)
+                if (hit.distance <= _maxInsteractDistance && hit.transform.CompareTag("Selectable"))
                 {
-                    if (hit.transform.CompareTag("Selectable"))
-                    {
-                        //show UI
-                        //....
-
-                        //we've got a selectable and it's different from the one we already have
-                        if (hit.transform != _selection)
-                        {
-                            RemoveHighlight();
-                            ApplyHighlight(hit);
-                        }
-                    }
-                    else
-                    {
-                        RemoveHighlight();
-                    }
-                }
-                else
-                {
+                    //show UI
+                    //....
                     RemoveHighlight();
+                    ApplyHighlight(hit);
                 }
             }
-            else
-            {
-                RemoveHighlight();
-            }
-        }
-        else
-        {
-            RemoveHighlight();
         }
 
         #endregion
 
         #region movement
 
-        _isGrounded = Physics.CheckSphere(_groundCheck.position, _groundDistance, _groundMask);
+        IsGroundedCheck();
 
         if (_isMoving)
         {
             float x = _inputMap.Player.Movement.ReadValue<Vector2>().x;
             float z = _inputMap.Player.Movement.ReadValue<Vector2>().y;
+
+            float camX = _followTransform.rotation.eulerAngles.x;
+
+            //set player rotation to be the same as the follow target
+            transform.rotation = Quaternion.Euler(0, _followTransform.rotation.eulerAngles.y, 0);
+
+            //reset target rotation
+            _followTransform.localEulerAngles = new Vector3(camX, _followTransform.rotation.y, _followTransform.rotation.z);
 
             Vector3 move = transform.right * x + transform.forward * z;
 
@@ -108,6 +95,11 @@ public class PlayerController : MonoBehaviour
         ApplyGravity();
 
         #endregion
+    }
+
+    private void Update()
+    {
+        
     }
     private void InitInput()
     {
@@ -185,10 +177,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void IsGroundedCheck()
+    {
+        _isGrounded = Physics.CheckSphere(_groundCheck.position, _groundDistance, _groundMask);
+    }
+
     private void Jump()
     {
-        //ground check
-        _isGrounded = Physics.CheckSphere(_groundCheck.position, _groundDistance, _groundMask);
+        IsGroundedCheck();
 
         if (_isGrounded)
         {
@@ -228,5 +224,5 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    
+
 }
