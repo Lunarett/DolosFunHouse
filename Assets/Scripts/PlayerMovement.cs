@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     //movement
 
     [SerializeField] private float _movementSpeed = 12f;
+    [SerializeField] private float _sprintingSpeed = 16f;
     [SerializeField] private float _jumpHeight = 2f;
 
     //gravity
@@ -25,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
 
     private float _groundDistance = 0.1f;
     private bool _isGrounded;
+
+    [SerializeField] private Animator _animator;
 
     public void Update()
     {
@@ -42,12 +45,25 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-        controller.Move(move * _movementSpeed * Time.deltaTime);
+        //sprinting
+        if (Input.GetButton("Sprint") && _isGrounded)
+        {
+            controller.Move(move * _sprintingSpeed * Time.deltaTime);
+            _animator.SetFloat("vertical", z * 2);
+            _animator.SetFloat("horizontal", x * 2);
+        }
+        else
+        {
+            controller.Move(move * _movementSpeed * Time.deltaTime);
+            _animator.SetFloat("vertical", z);
+            _animator.SetFloat("horizontal", x);
+        }
 
         //jumping
         if (Input.GetButtonDown("Jump") && _isGrounded)
         {
             _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity.y);
+            _animator.SetTrigger("Jump");
         }
 
         //gravity
