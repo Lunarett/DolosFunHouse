@@ -7,9 +7,20 @@ public class CharacterSelection : MonoBehaviour
 {
     [SerializeField] private GameObject[] _characters;
     [SerializeField] private int _selectedCharacter;
+    [SerializeField] private Vector3 _spawnPos;
+
+    //private void Start()
+    //{
+    //    _characters[_selectedCharacter].SetActive(true);
+    //}
 
     private void Start()
     {
+        for (int i = 0; i < _characters.Length; i++)
+        {
+            Instantiate(_characters[i], _spawnPos, Quaternion.identity, gameObject.transform);
+        }
+
         _characters[_selectedCharacter].SetActive(true);
     }
 
