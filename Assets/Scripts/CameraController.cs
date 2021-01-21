@@ -5,31 +5,65 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [SerializeField] private float _mouseSensitivity = 100f;
+    [SerializeField] private float _xRotClamp = 90f;
+    [SerializeField] private Transform _followTarget;
 
-    [SerializeField] private Transform _playerTransform;
+    //input
+    private InputMap _inputMap;
 
-    private float _xRotation = 0f;
-
-    // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Awake()
     {
-        FollowMouse();
+        InitInput();
     }
 
-    private void FollowMouse()
+    private void InitInput()
     {
-        float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity * Time.deltaTime;
+        _inputMap = new InputMap();
+        _inputMap.Player.Look.performed += context => FollowMouse(context.ReadValue<Vector2>());
+    }
 
-        _xRotation = Mathf.Clamp(_xRotation - mouseY, -90f, 90f);
+    private void FollowMouse(Vector2 mouseInput)
+    {
+        //we receive a Vector2 where x is the horizontal and y the vertical movement of the mouse over time (delta)
+        float moveX = mouseInput.x * _mouseSensitivity * Time.deltaTime;
+        float moveY = -mouseInput.y * _mouseSensitivity * Time.deltaTime;
 
-        transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
-        _playerTransform.Rotate(Vector3.up * mouseX);
+        Vector3 rotation = _followTarget.eulerAngles + new Vector3(moveY, moveX, 0f);
+
+        rotation.x = ClampAngle(rotation.x, -_xRotClamp, _xRotClamp);
+
+        _followTarget.eulerAngles = rotation;
+    }
+
+    public void OnEnable()
+    {
+        _inputMap.Enable();
+    }
+
+    public void OnDisable()
+    {
+        _inputMap.Disable();
+    }
+
+    //source: https://answers.unity.com/questions/659932/how-do-i-clamp-my-rotation.html
+    float ClampAngle(float angle, float from, float to)
+    {
+        if (angle < 0f)
+        {
+            angle += 360;
+        }
+
+        if (angle > 180f)
+        {
+            return Mathf.Max(angle, 360 + from);
+        }
+
+        return Mathf.Min(angle, to);
     }
 }
