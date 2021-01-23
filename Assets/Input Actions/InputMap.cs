@@ -49,6 +49,14 @@ public class @InputMap : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""Escape"",
+                    ""type"": ""Button"",
+                    ""id"": ""fc6396b2-6196-43ab-940d-188d4c702b3c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
                 }
             ],
             ""bindings"": [
@@ -139,6 +147,17 @@ public class @InputMap : IInputActionCollection, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""61e789e9-2a80-4e31-a914-a9b040ed0d7a"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Escape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -214,6 +233,7 @@ public class @InputMap : IInputActionCollection, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+        m_Player_Escape = m_Player.FindAction("Escape", throwIfNotFound: true);
         // Barrel
         m_Barrel = asset.FindActionMap("Barrel", throwIfNotFound: true);
         m_Barrel_Leave = m_Barrel.FindAction("Leave", throwIfNotFound: true);
@@ -271,6 +291,7 @@ public class @InputMap : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Look;
+    private readonly InputAction m_Player_Escape;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -279,6 +300,7 @@ public class @InputMap : IInputActionCollection, IDisposable
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Look => m_Wrapper.m_Player_Look;
+        public InputAction @Escape => m_Wrapper.m_Player_Escape;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -300,6 +322,9 @@ public class @InputMap : IInputActionCollection, IDisposable
                 @Look.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
                 @Look.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
                 @Look.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLook;
+                @Escape.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEscape;
+                @Escape.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEscape;
+                @Escape.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnEscape;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -316,6 +341,9 @@ public class @InputMap : IInputActionCollection, IDisposable
                 @Look.started += instance.OnLook;
                 @Look.performed += instance.OnLook;
                 @Look.canceled += instance.OnLook;
+                @Escape.started += instance.OnEscape;
+                @Escape.performed += instance.OnEscape;
+                @Escape.canceled += instance.OnEscape;
             }
         }
     }
@@ -376,6 +404,7 @@ public class @InputMap : IInputActionCollection, IDisposable
         void OnInteract(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnEscape(InputAction.CallbackContext context);
     }
     public interface IBarrelActions
     {
