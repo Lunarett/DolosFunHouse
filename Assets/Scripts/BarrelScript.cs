@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 
 public class BarrelScript : Interactible
@@ -24,6 +25,11 @@ public class BarrelScript : Interactible
         InitInput();
     }
 
+    public void Start()
+    {
+        _inputMap.Disable();
+    }
+
     public override void Interact(GameObject playerObject)
     {
         base.Interact(playerObject);
@@ -34,17 +40,17 @@ public class BarrelScript : Interactible
         }
     }
 
-    private void MovePlayer(GameObject playerObject, Transform destination)
+    private void MovePlayer(Transform destination)
     {
-        playerObject.transform.position = destination.position;
-        playerObject.transform.rotation = destination.rotation;
+        _player.transform.position = destination.position;
+        _player.transform.rotation = destination.rotation;
     }
     private void EnterBarrel(GameObject playerObject)
     {
         OnEnable();
         //move player character
-        MovePlayer(playerObject, transform);
         _player = playerObject;
+        MovePlayer(transform);
         PlayerController playerController = _player.GetComponent<PlayerController>();
 
         _isOccupied = true;
@@ -58,7 +64,7 @@ public class BarrelScript : Interactible
     {
         if (_exitTransform != null)
         {
-            MovePlayer(_player, _exitTransform);
+            MovePlayer(_exitTransform);
 
             _isOccupied = false;
             PlayerController playerController = _player.GetComponent<PlayerController>();
