@@ -140,5 +140,10 @@ namespace Michsky.UI.Dark
 					homeBlurManager.BlurOutAnim();
 			}
 		}
+
+		public void ExitGame()
+		{
+			Application.Quit();
+		}
 	}
 }
