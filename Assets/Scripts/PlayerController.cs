@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     private Renderer _selectionRenderer;
     private Transform _selection;
     [SerializeField] private float _maxInsteractDistance = 2f;
+    [SerializeField] private LayerMask _playerLayer;
 
     //camera
     [SerializeField] Camera _playerCam;
@@ -59,12 +60,13 @@ public class PlayerController : MonoBehaviour
 
         if (_playerCam.gameObject.activeSelf)
         {
-            Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
+            //Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
 
-            Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
+            //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
+            Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
 
-
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            //ray cast will ignore everything on the player layer because of the ~
+            if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, ~_playerLayer))
             {
                 if (hit.distance <= _maxInsteractDistance && hit.transform.CompareTag("Selectable"))
                 {
@@ -261,7 +263,7 @@ public class PlayerController : MonoBehaviour
 
         //Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
 
-        Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
+        Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
 
         Gizmos.DrawRay(ray);
     }
