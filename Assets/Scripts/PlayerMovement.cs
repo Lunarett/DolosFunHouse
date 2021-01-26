@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
     private bool _isGrounded;
 
     [SerializeField] private Animator _animator;
-
+    /*
     public void Update()
     {
         //ground check
@@ -69,5 +69,5 @@ public class PlayerMovement : MonoBehaviour
         //gravity
         _velocity += _gravity * Time.deltaTime;
         controller.Move(_velocity * Time.deltaTime);
-    }
+    }*/
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class DustinPlayerMovement : MonoBehaviour
 {
     //based on this tutorial https://www.youtube.com/watch?v=_QajrabyTJc&ab_channel=Brackeys
 
