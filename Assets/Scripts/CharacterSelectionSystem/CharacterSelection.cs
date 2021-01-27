@@ -21,12 +21,10 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
 
     [SerializeField] private Button _startGameButton;
     [SerializeField] private Button _isReadyButton;
-    [SerializeField] private Button _isDefaultClassButton;
 
     [SerializeField] private int _indexOfFirstKiller;
 
     [SerializeField] private bool _isReady;
-    [SerializeField] private bool _isDefaultClass = true;
 
     private bool[] _readyStates;
     private bool[] _classStates;
@@ -67,15 +65,7 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         _selectedCharacter = 0;
         _characters[_selectedCharacter].SetActive(true);
 
-        //object[] content = new object[]
-        //{
-        //    PhotonNetwork.LocalPlayer.ActorNumber,
-        //    _isSurvivor
-        //};
-        //RaiseEventOptions options = new RaiseEventOptions();
-        //options.Receivers = ReceiverGroup.All;
-        //
-        //PhotonNetwork.RaiseEvent((byte)CustomEventCode.CharacterSelectionClass, content, options, ExitGames.Client.Photon.SendOptions.SendReliable);
+        RaiseCharacterClassChangeEvent();
     }
 
     public void PlayAsKiller()
@@ -90,46 +80,15 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         _selectedCharacter = _indexOfFirstKiller;
         _characters[_selectedCharacter].SetActive(true);
 
-        //object[] content = new object[]
-        //{
-        //    PhotonNetwork.LocalPlayer.ActorNumber,
-        //    _isKiller
-        //};
-        //RaiseEventOptions options = new RaiseEventOptions();
-        //options.Receivers = ReceiverGroup.All;
-        //
-        //PhotonNetwork.RaiseEvent((byte)CustomEventCode.CharacterSelectionClass, content, options, ExitGames.Client.Photon.SendOptions.SendReliable);
+        RaiseCharacterClassChangeEvent();
     }
 
-    public void SwitchClass()
+    private void RaiseCharacterClassChangeEvent()
     {
-        UnreadyIfReady();
-
-        if (_isDefaultClass)
-        {
-            _isDefaultClass = false;
-            Debug.Log("You play as a killer");
-            _isDefaultClassButton.GetComponentInChildren<TMP_Text>().text = "Play as survivor";
-
-            _characters[_selectedCharacter].SetActive(false);
-            _selectedCharacter = _indexOfFirstKiller;
-            _characters[_selectedCharacter].SetActive(true);
-        }
-        else
-        {
-            _isDefaultClass = true;
-            Debug.Log("You play as a survivor");
-            _isDefaultClassButton.GetComponentInChildren<TMP_Text>().text = "Play as killer";
-
-            _characters[_selectedCharacter].SetActive(false);
-            _selectedCharacter = 0;
-            _characters[_selectedCharacter].SetActive(true);
-        }
-
         object[] content = new object[]
         {
             PhotonNetwork.LocalPlayer.ActorNumber,
-            _isDefaultClass
+            _isKiller
         };
         RaiseEventOptions options = new RaiseEventOptions();
         options.Receivers = ReceiverGroup.All;
@@ -250,15 +209,10 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         {
             object[] content = (object[])photonEvent.CustomData;
 
-            //bool isSurvivor = (bool)content[1];
-            //bool isKiller = (bool)content[2];
-            //int actorNumber = (int)content[0];
-
-            bool isDefaultClass = (bool)content[1];
+            bool isKiller = (bool)content[1];
             int actorNumber = (int)content[0];
 
-            //_classStates[actorNumber - 1] = isSurvivor || isKiller;
-            _classStates[actorNumber - 1] = isDefaultClass;
+            _classStates[actorNumber - 1] = isKiller;
         }
     }
 
@@ -287,7 +241,7 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
     {
         for (int i = 0; i < _classStates.Length; i++)
         {
-            if (!_readyStates[i])
+            if (_classStates[i])
             {
                 return true;
             }
