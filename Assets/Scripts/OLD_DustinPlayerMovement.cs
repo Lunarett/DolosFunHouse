@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class DustinPlayerMovement : MonoBehaviour
 {
     //based on this tutorial https://www.youtube.com/watch?v=_QajrabyTJc&ab_channel=Brackeys
 
@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
     private bool _isGrounded;
 
     [SerializeField] private Animator _animator;
-    /*
+
     public void Update()
     {
         //ground check
@@ -69,5 +69,5 @@ public class PlayerMovement : MonoBehaviour
         //gravity
         _velocity += _gravity * Time.deltaTime;
         controller.Move(_velocity * Time.deltaTime);
-    }*/
+    }
 }

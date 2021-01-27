@@ -6,11 +6,12 @@ using UnityEngine.Events;
 public class PlayerController : MonoBehaviour
 {
     //selection
-    [SerializeField] private Material highlightMaterial;
-    private Material defaultMaterial;
+    [SerializeField] private Material _highlightMaterial;
+    private Material _defaultMaterial;
     private Renderer _selectionRenderer;
     private Transform _selection;
     [SerializeField] private float _maxInsteractDistance = 2f;
+    [SerializeField] private LayerMask _playerLayer;
 
     //camera
     [SerializeField] Camera _playerCam;
@@ -24,9 +25,12 @@ public class PlayerController : MonoBehaviour
     private InputMap _inputMap;
 
     //movement
-    [SerializeField] private float _movementSpeed = 12f;
-    [SerializeField] private float _jumpHeight = 10f;
+    [SerializeField] private float _movementSpeed = 8f;
+    [SerializeField] private float _jumpHeight = 2;
     private bool _isMoving = false;
+    private bool _isSprinting = false;
+    private bool _isJumping = false;
+    private float _sprintModifier = 2;
 
     //gravity
     private Vector3 _gravity = Physics.gravity;
@@ -38,6 +42,8 @@ public class PlayerController : MonoBehaviour
     private float _groundDistance = 0.1f;
     private bool _isGrounded = false;
 
+    //animation
+    [SerializeField] private Animator _animator;
 
     private void Awake()
     {
@@ -54,9 +60,13 @@ public class PlayerController : MonoBehaviour
 
         if (_playerCam.gameObject.activeSelf)
         {
-            Ray ray = new Ray(transform.position, _playerCam.transform.forward * _maxInsteractDistance);
+            //Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
 
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
+            Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+
+            //ray cast will ignore everything on the player layer because of the ~
+            if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, ~_playerLayer))
             {
                 if (hit.distance <= _maxInsteractDistance && hit.transform.CompareTag("Selectable"))
                 {
@@ -81,15 +91,45 @@ public class PlayerController : MonoBehaviour
 
             float camX = _followTransform.rotation.eulerAngles.x;
 
+
             //set player rotation to be the same as the follow target
             transform.rotation = Quaternion.Euler(0, _followTransform.rotation.eulerAngles.y, 0);
 
             //reset target rotation
-            _followTransform.localEulerAngles = new Vector3(camX, _followTransform.rotation.y, _followTransform.rotation.z);
+            _followTransform.localEulerAngles = new Vector3(camX, 0, 0);
 
-            Vector3 move = transform.right * x + transform.forward * z;
 
-            controller.Move(move * _movementSpeed * Time.deltaTime);
+            Vector3 move = _followTransform.right * x + _followTransform.forward * z;
+
+
+            if (_isSprinting)
+            {
+                controller.Move(move * _movementSpeed * _sprintModifier * Time.deltaTime);
+
+                if (!_isJumping)
+                {
+                    _animator.SetFloat("vertical", z * _sprintModifier);
+                    _animator.SetFloat("horizontal", x * _sprintModifier);
+                }
+
+            }
+            else
+            {
+                controller.Move(move * _movementSpeed * Time.deltaTime);
+
+                if (!_isJumping)
+                {
+
+                    _animator.SetFloat("vertical", z);
+                    _animator.SetFloat("horizontal", x);
+                }
+            }
+        }
+
+        else
+        {
+            _animator.SetFloat("vertical", 0);
+            _animator.SetFloat("horizontal", 0);
         }
 
         ApplyGravity();
@@ -97,16 +137,14 @@ public class PlayerController : MonoBehaviour
         #endregion
     }
 
-    private void Update()
-    {
-        
-    }
     private void InitInput()
     {
         _inputMap = new InputMap();
         _inputMap.Player.Movement.performed += context => Move();
         _inputMap.Player.Jump.performed += context => Jump();
         _inputMap.Player.Interact.performed += context => Interact();
+        _inputMap.Player.Sprint.performed += context => Sprint();
+        _inputMap.Player.Sprint.canceled += context => Sprint();
     }
 
     private void ApplyHighlight(RaycastHit hit)
@@ -117,8 +155,8 @@ public class PlayerController : MonoBehaviour
 
         if (_selectionRenderer != null)
         {
-            defaultMaterial = _selectionRenderer.material;
-            _selectionRenderer.material = highlightMaterial;
+            _defaultMaterial = _selectionRenderer.material;
+            _selectionRenderer.material = _highlightMaterial;
         }
     }
 
@@ -126,7 +164,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_selection != null)
         {
-            _selectionRenderer.material = defaultMaterial;
+            _selectionRenderer.material = _defaultMaterial;
             _selection = null;
             _selectionRenderer = null;
         }
@@ -157,29 +195,17 @@ public class PlayerController : MonoBehaviour
         if (controller.enabled)
         {
             _isMoving = !_isMoving;
-            //ground check
-            //_isGrounded = Physics.CheckSphere(_groundCheck.position, _groundDistance, _groundMask);
-            /*
-            if (_isGrounded && _velocity.y < 0f)
-            {
-                _velocity.y = -2f;
-            }
-            */
-            //movement
-            //float x = _inputMap.Player.Movement.ReadValue<Vector2>().x;
-            //float z = _inputMap.Player.Movement.ReadValue<Vector2>().y;
-            //float x = direction.x;
-            //float z = direction.y;
-
-            //Vector3 move = transform.right * x + transform.forward * z;
-
-            //controller.Move(move * _movementSpeed * Time.deltaTime);
         }
     }
 
     private void IsGroundedCheck()
     {
         _isGrounded = Physics.CheckSphere(_groundCheck.position, _groundDistance, _groundMask);
+
+        if (_isGrounded)
+        {
+            _isJumping = false;
+        }
     }
 
     private void Jump()
@@ -189,7 +215,14 @@ public class PlayerController : MonoBehaviour
         if (_isGrounded)
         {
             _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity.y);
+            _animator.SetTrigger("Jump");
+            _isJumping = true;
         }
+    }
+
+    private void Sprint()
+    {
+        _isSprinting = !_isSprinting;
     }
 
     private void ApplyGravity()
@@ -224,5 +257,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnDrawGizmos()
+    {
+        //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
 
+        //Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
+
+        Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+
+        Gizmos.DrawRay(ray);
+    }
 }
