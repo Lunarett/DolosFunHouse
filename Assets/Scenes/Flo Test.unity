@@ -833,7 +833,7 @@ GameObject:
   - component: {fileID: 1989140957}
   - component: {fileID: 1989140956}
   - component: {fileID: 1989140955}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube_1
   m_TagString: Selectable
   m_Icon: {fileID: 0}
@@ -1356,6 +1356,18 @@ PrefabInstance:
     - target: {fileID: 6538294706377744510, guid: 3c4779dd99c0a744a932fd6c397a4284, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7211988749032452537, guid: 3c4779dd99c0a744a932fd6c397a4284, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7211988749032452537, guid: 3c4779dd99c0a744a932fd6c397a4284, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.467
+      objectReference: {fileID: 0}
+    - target: {fileID: 7211988749032452537, guid: 3c4779dd99c0a744a932fd6c397a4284, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.7100003
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c4779dd99c0a744a932fd6c397a4284, type: 3}
