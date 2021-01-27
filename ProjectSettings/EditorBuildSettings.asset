@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/DustinTest/DebugConnectionMenu.unity
+    guid: 744c7df4682bf413ab99d71b9b32bb3e
+  - enabled: 1
     path: Assets/Scenes/DustinTest/CharacterSelectionScreen.unity
     guid: 20543f0ad811b4965aa4ae3c3e633fc1
   - enabled: 1
