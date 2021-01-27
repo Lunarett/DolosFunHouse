@@ -98,9 +98,10 @@ public class PlayerController : MonoBehaviour
             //reset target rotation
             _followTransform.localEulerAngles = new Vector3(camX, 0, 0);
 
+            Vector3 xMove = new Vector3(_followTransform.right.x, 0, _followTransform.right.z) * x;
+            Vector3 zMove = new Vector3(_followTransform.forward.x, 0, _followTransform.forward.z) * z;
 
-            Vector3 move = _followTransform.right * x + _followTransform.forward * z;
-
+            Vector3 move = xMove + zMove;
 
             if (_isSprinting)
             {
@@ -111,7 +112,6 @@ public class PlayerController : MonoBehaviour
                     _animator.SetFloat("vertical", z * _sprintModifier);
                     _animator.SetFloat("horizontal", x * _sprintModifier);
                 }
-
             }
             else
             {
@@ -264,12 +264,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnDrawGizmos()
     {
-        //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
+        //Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
 
-        //Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
-
-        Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
-
-        Gizmos.DrawRay(ray);
+        //Gizmos.DrawRay(ray);
     }
 }
