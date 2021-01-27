@@ -3,34 +3,34 @@ using UnityEngine.Events;
 
 namespace Michsky.UI.Dark
 {
-    public class PressKeyEvent : MonoBehaviour
-    {
-        [Header("KEY")]
-        [SerializeField]
-        public KeyCode hotkey;
-        public bool pressAnyKey;
+	public class PressKeyEvent : MonoBehaviour
+	{
+		[Header("KEY")]
+		[SerializeField]
+		public KeyCode hotkey;
+		public bool pressAnyKey;
 
-        [Header("KEY ACTION")]
-        [SerializeField]
-        public UnityEvent pressAction;
+		[Header("KEY ACTION")]
+		[SerializeField]
+		public UnityEvent pressAction;
 
-        void Update()
-        {
-            if(pressAnyKey == true)
-            {
-                if (Input.anyKeyDown)
-                {
-                    pressAction.Invoke();
-                } 
-            }
+		void Update()
+		{
+			if (pressAnyKey == true)
+			{
+				if (Input.anyKeyDown)
+				{
+					pressAction.Invoke();
+				}
+			}
 
-            else
-            {
-                if (Input.GetKeyDown(hotkey))
-                {
-                    pressAction.Invoke();
-                } 
-            }
-        }
-    }
+			else
+			{
+				if (Input.GetKeyDown(hotkey))
+				{
+					pressAction.Invoke();
+				}
+			}
+		}
+	}
 }
