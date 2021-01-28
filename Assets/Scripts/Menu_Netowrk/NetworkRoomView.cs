@@ -17,6 +17,10 @@ public class NetworkRoomView : MonoBehaviourPunCallbacks, IOnEventCallback
 
 	private bool Ready;
 
+	private void Start()
+	{
+		PhotonNetwork.AutomaticallySyncScene = true;
+	}
 
 	public void ReadyUp()
 	{
@@ -61,7 +65,6 @@ public class NetworkRoomView : MonoBehaviourPunCallbacks, IOnEventCallback
 
 	public void LoadScene()
 	{
-		PhotonNetwork.AutomaticallySyncScene = true;
 		PhotonNetwork.LoadLevel(1);
 	}
 
