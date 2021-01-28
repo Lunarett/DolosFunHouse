@@ -248,27 +248,24 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void StartJump()
     {
-        photonView.RPC("RPC_Jump", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("RPC_Jump", RpcTarget.All);
+        }
     }
     [PunRPC]
     private void RPC_Jump()
     {
-        if (photonView.IsMine)
-        {
-            IsGroundedCheck();
 
-            if (_isGrounded)
-            {
-                _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity.y);
-                _animator.SetTrigger("Jump");
-                _isJumping = true;
-            }
-        }
-        else
+        IsGroundedCheck();
+
+        if (_isGrounded)
         {
-            //animate here?
+            _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity.y);
+            _animator.SetTrigger("Jump");
+            _isJumping = true;
         }
-        
+
     }
 
     private void StartSprint()
