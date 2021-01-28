@@ -11,10 +11,7 @@ using ExitGames.Client.Photon;
 
 public class CharacterSelection : MonoBehaviour, IOnEventCallback
 {
-    [SerializeField] private GameObject[] _characterPrefabs;
     [SerializeField] private int _selectedCharacter;
-    [SerializeField] private Vector3 _spawnPos;
-    private GameObject[] _characters;
 
     [SerializeField] private bool _isSurvivor;
     [SerializeField] private bool _isKiller;
@@ -26,8 +23,11 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
 
     [SerializeField] private bool _isReady;
 
-    private bool[] _readyStates;
-    private bool[] _classStates;
+    private VisualizeClient[] _clients;
+    [SerializeField] private GameObject _clientPrefab;
+    [SerializeField] private GameObject _clientParent;
+
+    [SerializeField] private int _totalSkins;
 
     private void Start()
     {
@@ -35,15 +35,15 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
 
         _startGameButton.gameObject.SetActive(false);
 
-        _characters = new GameObject[_characterPrefabs.Length];
-        _readyStates = new bool[PhotonNetwork.CurrentRoom.PlayerCount];
-        _classStates = new bool[PhotonNetwork.CurrentRoom.PlayerCount];
+        _clients = new VisualizeClient[PhotonNetwork.CurrentRoom.PlayerCount];
 
-        for (int i = 0; i < _characterPrefabs.Length; i++)
+        for (int i = 0; i < _clients.Length; i++)
         {
-            _characters[i] = Instantiate(_characterPrefabs[i], _spawnPos, Quaternion.identity, gameObject.transform);
-            _characters[i].SetActive(false);
+            _clients[i] = Instantiate(_clientPrefab, Vector3.zero, Quaternion.identity, _clientParent.transform).GetComponent<VisualizeClient>();
+            _clients[i].Setup(PhotonNetwork.CurrentRoom.Players[i + 1].NickName, i);
         }
+
+        
 
         PlayAsSurvivor();
     }
@@ -61,11 +61,10 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         _isSurvivor = true;
         Debug.Log("You play as a survivor");
 
-        _characters[_selectedCharacter].SetActive(false);
         _selectedCharacter = 0;
-        _characters[_selectedCharacter].SetActive(true);
 
         RaiseCharacterClassChangeEvent();
+        RaiseCharacterChangeEvent();
     }
 
     public void PlayAsKiller()
@@ -76,31 +75,16 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         _isKiller = true;
         Debug.Log("You play as a killer");
 
-        _characters[_selectedCharacter].SetActive(false);
         _selectedCharacter = _indexOfFirstKiller;
-        _characters[_selectedCharacter].SetActive(true);
 
         RaiseCharacterClassChangeEvent();
-    }
-
-    private void RaiseCharacterClassChangeEvent()
-    {
-        object[] content = new object[]
-        {
-            PhotonNetwork.LocalPlayer.ActorNumber,
-            _isKiller
-        };
-        RaiseEventOptions options = new RaiseEventOptions();
-        options.Receivers = ReceiverGroup.All;
-
-        PhotonNetwork.RaiseEvent((byte)CustomEventCode.CharacterSelectionClass, content, options, ExitGames.Client.Photon.SendOptions.SendReliable);
+        RaiseCharacterChangeEvent();
     }
 
     public void NextCharacter()
     {
         UnreadyIfReady();
 
-        _characters[_selectedCharacter].SetActive(false);
 
         if (_isSurvivor)
         {
@@ -110,20 +94,20 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         {
             _selectedCharacter++;
 
-            if (_selectedCharacter >= _characters.Length)
+            if (_selectedCharacter >= _totalSkins)
             {
                 _selectedCharacter = _indexOfFirstKiller;
             }
         }
 
-        _characters[_selectedCharacter].SetActive(true);
+
+        RaiseCharacterChangeEvent();
     }
 
     public void PreviousCharacter()
     {
         UnreadyIfReady();
 
-        _characters[_selectedCharacter].SetActive(false);
         _selectedCharacter--;
 
         if (_isSurvivor)
@@ -137,11 +121,11 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         {
             if (_selectedCharacter < _indexOfFirstKiller)
             {
-                _selectedCharacter = _characters.Length - 1;
+                _selectedCharacter = _totalSkins - 1;
             }
         }
 
-        _characters[_selectedCharacter].SetActive(true);
+        RaiseCharacterChangeEvent();
     }
 
     public void StartGame()
@@ -190,7 +174,7 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
             bool isReady = (bool)content[1];
             int actorNumber = (int)content[0];
 
-            _readyStates[actorNumber - 1] = isReady;
+            _clients[actorNumber - 1].SetReady(isReady);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -212,23 +196,25 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
             bool isKiller = (bool)content[1];
             int actorNumber = (int)content[0];
 
-            _classStates[actorNumber - 1] = isKiller;
+            _clients[actorNumber - 1].SetKiller(isKiller);
         }
-    }
 
-    private void OnGUI()
-    {
-        foreach (var player in PhotonNetwork.CurrentRoom.Players)
+        if (photonEvent.Code == (byte)CustomEventCode.CharacterSelcetionChangedCharacter)
         {
-            GUILayout.Label(player.Value.NickName + " " + _classStates[player.Key - 1] + " " + _readyStates[player.Key - 1]);
+            object[] content = (object[])photonEvent.CustomData;
+
+            int actorNumber = (int)content[0];
+            int newSkin = (int)content[1];
+
+            _clients[actorNumber - 1].SetSelectedSkin(newSkin);
         }
     }
 
     private bool AreAllPlayersReady()
     {
-        for (int i = 0; i < _readyStates.Length; i++)
+        for (int i = 0; i < _clients.Length; i++)
         {
-            if (!_readyStates[i])
+            if (!_clients[i].IsReady())
             {
                 return false;
             }
@@ -239,9 +225,9 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
 
     private bool ExistsAKiller()
     {
-        for (int i = 0; i < _classStates.Length; i++)
+        for (int i = 0; i < _clients.Length; i++)
         {
-            if (_classStates[i])
+            if (_clients[i].IsKiller())
             {
                 return true;
             }
@@ -256,5 +242,31 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         {
             ToggleReady();
         }
+    }
+
+    private void RaiseCharacterClassChangeEvent()
+    {
+        object[] content = new object[]
+        {
+            PhotonNetwork.LocalPlayer.ActorNumber,
+            _isKiller
+        };
+        RaiseEventOptions options = new RaiseEventOptions();
+        options.Receivers = ReceiverGroup.All;
+
+        PhotonNetwork.RaiseEvent((byte)CustomEventCode.CharacterSelectionClass, content, options, ExitGames.Client.Photon.SendOptions.SendReliable);
+    }
+
+    private void RaiseCharacterChangeEvent()
+    {
+        object[] content = new object[]
+        {
+            PhotonNetwork.LocalPlayer.ActorNumber,
+            _selectedCharacter
+        };
+        RaiseEventOptions options = new RaiseEventOptions();
+        options.Receivers = ReceiverGroup.All;
+
+        PhotonNetwork.RaiseEvent((byte)CustomEventCode.CharacterSelcetionChangedCharacter, content, options, ExitGames.Client.Photon.SendOptions.SendReliable);
     }
 }
