@@ -14,6 +14,8 @@ public class VisualizeClient : MonoBehaviour
     [SerializeField] private TMP_Text _killerState;
     [SerializeField] private TMP_Text _currentSkin;
 
+    [SerializeField] private GameObject[] _characterPrefabs;
+    private GameObject[] _characters;
 
     public void SetReady(bool readyState)
     {
@@ -55,12 +57,24 @@ public class VisualizeClient : MonoBehaviour
 
     public void SetSelectedSkin(int selectedSkin)
     {
+        _characters[_selectedSkin].SetActive(false);
+
         _selectedSkin = selectedSkin;
         _currentSkin.text = "Skin: " + selectedSkin;
+
+        _characters[_selectedSkin].SetActive(true);
     }
 
-    public void SetName(string name)
+    public void Setup(string name, int index)
     {
         _playerName.text = name;
+
+        _characters = new GameObject[_characterPrefabs.Length];
+
+        for (int i = 0; i < _characterPrefabs.Length; i++)
+        {
+            _characters[i] = Instantiate(_characterPrefabs[i], Vector3.right * index, Quaternion.identity);
+            _characters[i].SetActive(false);
+        }
     }
 }

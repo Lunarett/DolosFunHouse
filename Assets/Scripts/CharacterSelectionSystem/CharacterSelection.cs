@@ -11,11 +11,7 @@ using ExitGames.Client.Photon;
 
 public class CharacterSelection : MonoBehaviour, IOnEventCallback
 {
-    [SerializeField] private GameObject[] _characterPrefabs;
     [SerializeField] private int _selectedCharacter;
-    [SerializeField] private Vector3 _spawnPos;
-
-    private GameObject[] _characters;
 
     [SerializeField] private bool _isSurvivor;
     [SerializeField] private bool _isKiller;
@@ -31,26 +27,23 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
     [SerializeField] private GameObject _clientPrefab;
     [SerializeField] private GameObject _clientParent;
 
+    [SerializeField] private int _totalSkins;
+
     private void Start()
     {
         PhotonNetwork.AddCallbackTarget(this);
 
         _startGameButton.gameObject.SetActive(false);
 
-        _characters = new GameObject[_characterPrefabs.Length];
         _clients = new VisualizeClient[PhotonNetwork.CurrentRoom.PlayerCount];
 
         for (int i = 0; i < _clients.Length; i++)
         {
-            _clients[i] = Instantiate(_clientPrefab, Vector3.right * i, Quaternion.identity, _clientParent.transform).GetComponent<VisualizeClient>();
-            _clients[i].SetName(PhotonNetwork.CurrentRoom.Players[i + 1].NickName);
+            _clients[i] = Instantiate(_clientPrefab, Vector3.zero, Quaternion.identity, _clientParent.transform).GetComponent<VisualizeClient>();
+            _clients[i].Setup(PhotonNetwork.CurrentRoom.Players[i + 1].NickName, i);
         }
 
-        for (int i = 0; i < _characterPrefabs.Length; i++)
-        {
-            _characters[i] = Instantiate(_characterPrefabs[i], _spawnPos, Quaternion.identity, gameObject.transform);
-            _characters[i].SetActive(false);
-        }
+        
 
         PlayAsSurvivor();
     }
@@ -68,9 +61,7 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         _isSurvivor = true;
         Debug.Log("You play as a survivor");
 
-        _characters[_selectedCharacter].SetActive(false);
         _selectedCharacter = 0;
-        _characters[_selectedCharacter].SetActive(true);
 
         RaiseCharacterClassChangeEvent();
         RaiseCharacterChangeEvent();
@@ -84,9 +75,7 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         _isKiller = true;
         Debug.Log("You play as a killer");
 
-        _characters[_selectedCharacter].SetActive(false);
         _selectedCharacter = _indexOfFirstKiller;
-        _characters[_selectedCharacter].SetActive(true);
 
         RaiseCharacterClassChangeEvent();
         RaiseCharacterChangeEvent();
@@ -96,7 +85,6 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
     {
         UnreadyIfReady();
 
-        _characters[_selectedCharacter].SetActive(false);
 
         if (_isSurvivor)
         {
@@ -106,13 +94,12 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         {
             _selectedCharacter++;
 
-            if (_selectedCharacter >= _characters.Length)
+            if (_selectedCharacter >= _totalSkins)
             {
                 _selectedCharacter = _indexOfFirstKiller;
             }
         }
 
-        _characters[_selectedCharacter].SetActive(true);
 
         RaiseCharacterChangeEvent();
     }
@@ -121,7 +108,6 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
     {
         UnreadyIfReady();
 
-        _characters[_selectedCharacter].SetActive(false);
         _selectedCharacter--;
 
         if (_isSurvivor)
@@ -135,11 +121,9 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         {
             if (_selectedCharacter < _indexOfFirstKiller)
             {
-                _selectedCharacter = _characters.Length - 1;
+                _selectedCharacter = _totalSkins - 1;
             }
         }
-
-        _characters[_selectedCharacter].SetActive(true);
 
         RaiseCharacterChangeEvent();
     }

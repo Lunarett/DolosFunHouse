@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Killer
+  m_text: Survivor
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -190,6 +190,23 @@ MonoBehaviour:
   _readyState: {fileID: 9061049946734784451}
   _killerState: {fileID: 7500431089909137447}
   _currentSkin: {fileID: 6938425784304097404}
+  _characterPrefabs:
+  - {fileID: 1084090695722338, guid: fca0db359d6a91b4c8c39324d314cd2e, type: 3}
+  - {fileID: 1423417334750076, guid: d2b11d59c34b8794a916e2e3adca29b6, type: 3}
+  - {fileID: 1435744202117670, guid: 8cccb88f6abce2445aec080d5a965bfb, type: 3}
+  - {fileID: 1387492477484550, guid: 7ee713c854e6be5469a1372d66b7bc40, type: 3}
+  - {fileID: 1042931328060984, guid: 7161ed0803b6af44eba14325b62837de, type: 3}
+  - {fileID: 1283291039809076, guid: 9877270705d01b540aeaa38895b9f95b, type: 3}
+  - {fileID: 1091438940017972, guid: 851e8547e58372347b1fc5cbc7bf3930, type: 3}
+  - {fileID: 1475337874035606, guid: c4e3b5d3572bced46ab0fdb482897812, type: 3}
+  - {fileID: 1753741187899190, guid: 45608daf8c357ac4883238b3247d64b7, type: 3}
+  - {fileID: 1428387009061096, guid: a96b63f27d072234bbc3d7818166e4eb, type: 3}
+  - {fileID: 1293082480778088, guid: beba2944035d3c54abd09d3d023aa9a8, type: 3}
+  - {fileID: 1438608989707952, guid: f6362dc4479aaf549a3fdaedef699623, type: 3}
+  - {fileID: 1698772203058814, guid: f3c9ecbe58652e1448eee0045d7036fe, type: 3}
+  - {fileID: 1547369703441942, guid: aa4de824abd97724da42ffc9d2b3c275, type: 3}
+  - {fileID: 1624536181693422, guid: 807c1226359007646905397056134019, type: 3}
+  - {fileID: 1877307886535162, guid: fda5edc93819a5946901f75bc534ac54, type: 3}
 --- !u!1 &3223066401277517117
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,7 +272,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Skin
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -389,7 +406,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Ready
+  m_text: Not ready
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
