@@ -55,6 +55,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void FixedUpdate()
     {
+        if (!photonView.AmOwner)
+            return;
+
         #region Interaction
 
         RemoveHighlight();
@@ -302,6 +305,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        throw new System.NotImplementedException();
+       
     }
 }
