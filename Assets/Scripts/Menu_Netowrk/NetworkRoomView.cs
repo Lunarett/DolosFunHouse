@@ -56,12 +56,12 @@ public class NetworkRoomView : MonoBehaviourPunCallbacks, IOnEventCallback
 
 		if(PhotonNetwork.IsMasterClient && IsAllReady())
 		{
-			Debug.Log("Worked");
+			//Debug.Log("Worked");
 			_startButton.SetActive(true);
 		}
 		else
 		{
-			Debug.Log("Nope");
+			//Debug.Log("Nope");
 			_startButton.SetActive(false);
 		}
 	}

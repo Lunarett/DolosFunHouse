@@ -16,7 +16,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     //camera
     [SerializeField] Camera _playerCam;
+    [SerializeField] GameObject _virtualCam;
     [SerializeField] Transform _followTransform;
+
 
 
     //character controller
@@ -46,16 +48,34 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     //animation
     [SerializeField] private Animator _animator;
 
-    private void Awake()
+
+    //test
+    [SerializeField] private string myName;
+
+    private void Start()
     {
+        if (!photonView.IsMine)
+        {
+            Debug.Log("This isn't " + photonView.Owner.NickName);
+            return;
+        }
+
+        _playerCam.gameObject.SetActive(true);
+        _virtualCam.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
         controller = gameObject.GetComponent<CharacterController>();
+
+        myName = photonView.Owner.NickName;
+    }
+
+    private void Awake()
+    {
         InitInput();
     }
 
     private void FixedUpdate()
     {
-        if (!photonView.AmOwner)
+        if (!photonView.IsMine)
             return;
 
         #region Interaction
@@ -142,7 +162,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     private void InitInput()
     {
         _inputMap = new InputMap();
-        _inputMap.Player.Movement.performed += context => StartMove();
+        _inputMap.Player.Movement.performed += context => Move();
         _inputMap.Player.Jump.performed += context => StartJump();
         _inputMap.Player.Interact.performed += context => StartInteract();
         _inputMap.Player.Sprint.performed += context => StartSprint();
@@ -198,17 +218,22 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         otherCam.gameObject.SetActive(!otherCam.gameObject.activeSelf);
     }
 
-    private void StartMove()
+    //private void StartMove()
+    //{
+    //    photonView.RPC("RPC_Move", RpcTarget.All);
+    //}
+
+    //[PunRPC]
+    //private void RPC_Move()
+    //{
+
+    //    _isMoving = !_isMoving;
+    //}
+
+    private void Move()
     {
-        photonView.RPC("RPC_Move", RpcTarget.All);
-    }
-    [PunRPC]
-    private void RPC_Move()
-    {
-        if (controller.enabled)
-        {
-            _isMoving = !_isMoving;
-        }
+
+        _isMoving = !_isMoving;
     }
 
     private void IsGroundedCheck()
@@ -228,14 +253,22 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     [PunRPC]
     private void RPC_Jump()
     {
-        IsGroundedCheck();
-
-        if (_isGrounded)
+        if (photonView.IsMine)
         {
-            _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity.y);
-            _animator.SetTrigger("Jump");
-            _isJumping = true;
+            IsGroundedCheck();
+
+            if (_isGrounded)
+            {
+                _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity.y);
+                _animator.SetTrigger("Jump");
+                _isJumping = true;
+            }
         }
+        else
+        {
+            //animate here?
+        }
+        
     }
 
     private void StartSprint()
@@ -255,17 +288,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     [PunRPC]
     private void RPC_ApplyGravity()
     {
-        if (controller.enabled)
+        _velocity += _gravity * Time.deltaTime;
+        // probably causes an error
+        controller.Move(_velocity * Time.deltaTime);
+
+        if (_isGrounded && _velocity.y < 0)
         {
-            _velocity += _gravity * Time.deltaTime;
-            controller.Move(_velocity * Time.deltaTime);
-
-            if (_isGrounded && _velocity.y < 0)
-            {
-                _velocity.y = 0;
-            }
+            _velocity.y = 0;
         }
-
     }
 
     private void OnEnable()
@@ -296,15 +326,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         }
     }
 
-    public void OnDrawGizmos()
-    {
-        //Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
-
-        //Gizmos.DrawRay(ray);
-    }
-
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-       
+
     }
 }

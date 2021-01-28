@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Statue : Interactible
 {
-    private bool _isActivated = false;
+    private bool _isActivated;
     private StatuePiece _keyPiece = null;
     [SerializeField] private GameObject _keyPrefab;
     [SerializeField] private Transform _keySpawnTransform;
