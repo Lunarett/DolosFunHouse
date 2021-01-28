@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         else
         {
             Instantiate(_playerPrefab, _spawnPoint.position, Quaternion.identity);
+            Debug.Log("couldn't connect to photon network");
         }
     }
 

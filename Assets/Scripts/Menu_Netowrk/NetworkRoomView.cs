@@ -7,7 +7,10 @@ using System.Collections.Generic;
 
 public enum CustomEventCode
 {
-	ForceRefresh = 100
+	ForceRefresh = 100,
+	CharacterSelectionReady = 101,
+	CharacterSelcetionChangedCharacter = 102,
+	CharacterSelectionClass = 103
 }
 
 public class NetworkRoomView : MonoBehaviourPunCallbacks, IOnEventCallback

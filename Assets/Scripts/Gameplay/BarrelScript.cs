@@ -56,7 +56,7 @@ public class BarrelScript : Interactible
         _isOccupied = true;
 
         //disable player control
-        playerController.ToggleCharacterActive();
+        playerController.StartToggleCharacterActive();
 
         playerController.SwitchActiveCam(_peekCam);
     }
@@ -69,7 +69,7 @@ public class BarrelScript : Interactible
             _isOccupied = false;
             PlayerController playerController = _player.GetComponent<PlayerController>();
 
-            playerController.ToggleCharacterActive();
+            playerController.StartToggleCharacterActive();
 
             playerController.SwitchActiveCam(_peekCam);
 
