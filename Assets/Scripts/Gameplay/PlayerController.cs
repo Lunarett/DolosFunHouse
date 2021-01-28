@@ -53,6 +53,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         InitInput();
     }
 
+    private void Start()
+    {
+        if (!photonView.IsMine)
+        {
+            _playerCam.gameObject.SetActive(false);
+        }
+    }
     private void FixedUpdate()
     {
         #region Interaction
@@ -302,6 +309,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 }
