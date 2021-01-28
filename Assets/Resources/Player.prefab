@@ -3715,7 +3715,7 @@ GameObject:
   - component: {fileID: 7211988748970639758}
   - component: {fileID: 7211988748970639757}
   - component: {fileID: 283700055129182975}
-  - component: {fileID: 2227471117508741110}
+  - component: {fileID: 3217760754372943685}
   m_Layer: 9
   m_Name: PlayerCharacter
   m_TagString: Untagged
@@ -3820,15 +3820,15 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   observableSearch: 2
-  Synchronization: 3
-  OwnershipTransfer: 0
+  Synchronization: 2
+  OwnershipTransfer: 1
   ObservedComponents:
   - {fileID: 7211988748970639756}
-  - {fileID: 2227471117508741110}
+  - {fileID: 3217760754372943685}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &2227471117508741110
+--- !u!114 &3217760754372943685
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -53,15 +53,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         InitInput();
     }
 
-    private void Start()
-    {
-        if (!photonView.IsMine)
-        {
-            _playerCam.gameObject.SetActive(false);
-        }
-    }
     private void FixedUpdate()
     {
+        if (!photonView.AmOwner)
+            return;
+
         #region Interaction
 
         RemoveHighlight();
@@ -309,6 +305,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        //throw new System.NotImplementedException();
+       
     }
 }
