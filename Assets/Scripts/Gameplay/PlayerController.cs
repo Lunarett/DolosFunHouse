@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Photon.Pun;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPun, IPunObservable
 {
     //selection
     [SerializeField] private Material _highlightMaterial;
@@ -54,14 +55,15 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!photonView.AmOwner)
+            return;
+
         #region Interaction
 
         RemoveHighlight();
 
         if (_playerCam.gameObject.activeSelf)
         {
-            //Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
-
             //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
             Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
 
@@ -98,9 +100,10 @@ public class PlayerController : MonoBehaviour
             //reset target rotation
             _followTransform.localEulerAngles = new Vector3(camX, 0, 0);
 
+            Vector3 xMove = new Vector3(_followTransform.right.x, 0, _followTransform.right.z) * x;
+            Vector3 zMove = new Vector3(_followTransform.forward.x, 0, _followTransform.forward.z) * z;
 
-            Vector3 move = _followTransform.right * x + _followTransform.forward * z;
-
+            Vector3 move = xMove + zMove;
 
             if (_isSprinting)
             {
@@ -111,7 +114,6 @@ public class PlayerController : MonoBehaviour
                     _animator.SetFloat("vertical", z * _sprintModifier);
                     _animator.SetFloat("horizontal", x * _sprintModifier);
                 }
-
             }
             else
             {
@@ -132,7 +134,7 @@ public class PlayerController : MonoBehaviour
             _animator.SetFloat("horizontal", 0);
         }
 
-        ApplyGravity();
+        StartApplyGravity();
 
         #endregion
     }
@@ -140,11 +142,11 @@ public class PlayerController : MonoBehaviour
     private void InitInput()
     {
         _inputMap = new InputMap();
-        _inputMap.Player.Movement.performed += context => Move();
-        _inputMap.Player.Jump.performed += context => Jump();
-        _inputMap.Player.Interact.performed += context => Interact();
-        _inputMap.Player.Sprint.performed += context => Sprint();
-        _inputMap.Player.Sprint.canceled += context => Sprint();
+        _inputMap.Player.Movement.performed += context => StartMove();
+        _inputMap.Player.Jump.performed += context => StartJump();
+        _inputMap.Player.Interact.performed += context => StartInteract();
+        _inputMap.Player.Sprint.performed += context => StartSprint();
+        _inputMap.Player.Sprint.canceled += context => StartSprint();
     }
 
     private void ApplyHighlight(RaycastHit hit)
@@ -170,7 +172,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void ToggleCharacterActive()
+    public void StartToggleCharacterActive()
+    {
+        photonView.RPC("RPC_ToggleCharacterActive", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPC_ToggleCharacterActive()
     {
         if (GetComponent<CharacterController>().enabled)
         {
@@ -190,7 +198,12 @@ public class PlayerController : MonoBehaviour
         otherCam.gameObject.SetActive(!otherCam.gameObject.activeSelf);
     }
 
-    private void Move()
+    private void StartMove()
+    {
+        photonView.RPC("RPC_Move", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_Move()
     {
         if (controller.enabled)
         {
@@ -208,7 +221,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Jump()
+    private void StartJump()
+    {
+        photonView.RPC("RPC_Jump", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_Jump()
     {
         IsGroundedCheck();
 
@@ -220,12 +238,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Sprint()
+    private void StartSprint()
+    {
+        photonView.RPC("RPC_Sprint", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_Sprint()
     {
         _isSprinting = !_isSprinting;
     }
 
-    private void ApplyGravity()
+    private void StartApplyGravity()
+    {
+        photonView.RPC("RPC_ApplyGravity", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_ApplyGravity()
     {
         if (controller.enabled)
         {
@@ -250,7 +278,13 @@ public class PlayerController : MonoBehaviour
         _inputMap.Disable();
     }
 
-    private void Interact()
+
+    private void StartInteract()
+    {
+        photonView.RPC("RPC_Interact", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_Interact()
     {
         Interactible interactible;
         if (_selection != null)
@@ -264,12 +298,13 @@ public class PlayerController : MonoBehaviour
 
     public void OnDrawGizmos()
     {
-        //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
+        //Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
 
-        //Vector3 shoulderOffset = new Vector3(_followTransform.localPosition.x + 0.5f, 0, 0);
+        //Gizmos.DrawRay(ray);
+    }
 
-        Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
-
-        Gizmos.DrawRay(ray);
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+       
     }
 }
