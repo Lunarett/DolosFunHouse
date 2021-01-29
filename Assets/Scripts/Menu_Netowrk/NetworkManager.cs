@@ -170,10 +170,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	public override void OnDisconnected(DisconnectCause cause)
 	{
-		if(_description != null)
-			_description.text = ErrorMsg.Instance.DisconnectCauses(cause);
-		OpenErrorMessage.Invoke();
-
 		if(PhotonNetwork.LocalPlayer != null)
 			RetryConnection();
 	}
