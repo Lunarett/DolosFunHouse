@@ -178,4 +178,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	{
 		GUILayout.Label(PhotonNetwork.NetworkClientState.ToString());
 	}
+
+	public void OnExitGame()
+	{
+		Application.Quit();
+	}
 }
