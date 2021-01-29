@@ -10,10 +10,12 @@ public class Statue : Interactible
     [SerializeField] private StatuePiece _key;
     [SerializeField] private GameObject _keyPrefab;
     [SerializeField] private Transform _keySpawnTransform;
+    [SerializeField] private GameObject _effects;
 
     public void Start()
     {
         _key.gameObject.SetActive(true);
+        _effects.SetActive(false);
     }
 
     public override void StartInteract(int playerViewID)
@@ -50,6 +52,8 @@ public class Statue : Interactible
         PhotonNetwork.Destroy(_key.gameObject);
 
         _isActivated = true;
+
+        _effects.SetActive(true);
     }
 
     private void SpawnKey()
