@@ -68,7 +68,6 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
         Cursor.lockState = CursorLockMode.Locked;
         _characterController = gameObject.GetComponent<CharacterController>();
 
-        myName = photonView.Owner.NickName;
 
         InitInput();
     }
