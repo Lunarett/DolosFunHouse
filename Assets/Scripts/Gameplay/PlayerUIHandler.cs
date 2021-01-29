@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Photon.Pun;
 
@@ -84,7 +83,7 @@ public class PlayerUIHandler : MonoBehaviour
 	public void ExitToMenu()
 	{
 		PhotonNetwork.Disconnect();
-		PhotonNetwork.LoadLevel(1);
+		SceneManager.LoadScene(0);
 	}
 
 	public void ExitToDesktop()
