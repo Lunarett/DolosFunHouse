@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using Photon.Pun;
+using Photon.Realtime;
 
 
 public class BarrelScript : Interactible
@@ -30,26 +32,39 @@ public class BarrelScript : Interactible
         _inputMap.Disable();
     }
 
-    public override void Interact(GameObject playerObject)
+    public override void StartInteract(int playerActorNumber)
     {
-        base.Interact(playerObject);
-
         if (!_isOccupied)
         {
-            EnterBarrel(playerObject);
+            Player player = PhotonNetwork.CurrentRoom.GetPlayer(playerActorNumber);
+
+            base.StartInteract(player.ActorNumber);
+
+            GameObject playerGameObject = (GameObject)player.TagObject;
+
+            EnterBarrel(playerGameObject);
         }
     }
+    //public override void StartInteract(GameObject playerObject)
+    //{
+    //    base.StartInteract(playerObject);
+
+    //    if (!_isOccupied)
+    //    {
+    //        EnterBarrel(playerObject);
+    //    }
+    //}
 
     private void MovePlayer(Transform destination)
     {
         _player.transform.position = destination.position;
         _player.transform.rotation = destination.rotation;
     }
-    private void EnterBarrel(GameObject playerObject)
+    private void EnterBarrel(GameObject player)
     {
         OnEnable();
         //move player character
-        _player = playerObject;
+        _player = player;
         MovePlayer(transform);
         PlayerController playerController = _player.GetComponent<PlayerController>();
 
@@ -60,6 +75,7 @@ public class BarrelScript : Interactible
 
         playerController.SwitchActiveCam(_peekCam);
     }
+
     void ExitBarrel()
     {
         if (_exitTransform != null)

@@ -7,7 +7,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     private PlayerController[] _players;
     [SerializeField] private GameObject _playerPrefab;
-    [SerializeField] private string _playerPrefabName;
 
     [SerializeField] private Transform _spawnPoint;
 
@@ -44,11 +43,12 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         Debug.Log("Spawned " + ammount + " players.");
     } */
+
     public void SpawnPlayer()
     {
         if (PhotonNetwork.IsConnected)
         {
-            PhotonNetwork.Instantiate(_playerPrefabName, _spawnPoint.position, Quaternion.identity);
+            PhotonNetwork.Instantiate(_playerPrefab.name, _spawnPoint.position, Quaternion.identity);
         }
         else
         {
