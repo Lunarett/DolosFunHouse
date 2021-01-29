@@ -55,23 +55,27 @@ public class BarrelScript : Interactible
     //    }
     //}
 
-    private void MovePlayer(Transform destination)
+    private void StartMovePlayer(Vector3 position)
     {
-        _player.transform.position = destination.position;
-        _player.transform.rotation = destination.rotation;
+        photonView.RPC("RPC_MovePlayer", RpcTarget.All, position);
+    }
+    [PunRPC]
+    private void RPC_MovePlayer(Vector3 position)
+    {
+        _player.transform.position = position;
     }
     private void EnterBarrel(GameObject player)
     {
         OnEnable();
         //move player character
         _player = player;
-        MovePlayer(transform);
+        StartMovePlayer(transform.position);
         PlayerController playerController = _player.GetComponent<PlayerController>();
 
         _isOccupied = true;
 
         //disable player control
-        playerController.StartToggleCharacterActive();
+        playerController.ToggleCharacterActive();
 
         playerController.SwitchActiveCam(_peekCam);
     }
@@ -80,12 +84,12 @@ public class BarrelScript : Interactible
     {
         if (_exitTransform != null)
         {
-            MovePlayer(_exitTransform);
+            StartMovePlayer(_exitTransform.position);
 
             _isOccupied = false;
             PlayerController playerController = _player.GetComponent<PlayerController>();
 
-            playerController.StartToggleCharacterActive();
+            playerController.ToggleCharacterActive();
 
             playerController.SwitchActiveCam(_peekCam);
 
