@@ -94,97 +94,99 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
     {
         if (!photonView.IsMine)
             return;
-
-        #region Interaction
-
-        RemoveHighlight();
-
-        if (_playerCam.gameObject.activeSelf)
+        if (_isEnabled)
         {
-            Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+            #region Interaction
 
-            //ray cast will ignore everything on the player layer because of the ~
-            if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, ~_playerLayer))
+            RemoveHighlight();
+
+            if (_playerCam.gameObject.activeSelf)
             {
-                if (hit.distance <= _maxInsteractDistance)
+                Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+
+                //ray cast will ignore everything on the player layer because of the ~
+                if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, ~_playerLayer))
                 {
-                    if (hit.transform.CompareTag("Selectable"))
+                    if (hit.distance <= _maxInsteractDistance)
                     {
-                        ApplyHighlight(hit);
-                    }
-                    else if (hit.transform.CompareTag("Player"))
-                    {
-                        _playerUI.SelectedCrosshair();
+                        if (hit.transform.CompareTag("Selectable"))
+                        {
+                            ApplyHighlight(hit);
+                        }
+                        else if (hit.transform.CompareTag("Player"))
+                        {
+                            _playerUI.SelectedCrosshair();
+                        }
+                        else
+                        {
+                            _playerUI.NormalCrosshair();
+                        }
                     }
                     else
                     {
                         _playerUI.NormalCrosshair();
                     }
                 }
+            }
+
+            #endregion
+
+            #region movement
+
+            IsGroundedCheck();
+
+            if (_isMoving)
+            {
+                float x = _inputMap.Player.Movement.ReadValue<Vector2>().x;
+                float z = _inputMap.Player.Movement.ReadValue<Vector2>().y;
+
+                float camX = _followTransform.rotation.eulerAngles.x;
+
+
+                //set player rotation to be the same as the follow target
+                transform.rotation = Quaternion.Euler(0, _followTransform.rotation.eulerAngles.y, 0);
+
+                //reset target rotation
+                _followTransform.localEulerAngles = new Vector3(camX, 0, 0);
+
+                Vector3 xMove = new Vector3(_followTransform.right.x, 0, _followTransform.right.z) * x;
+                Vector3 zMove = new Vector3(_followTransform.forward.x, 0, _followTransform.forward.z) * z;
+
+                Vector3 move = xMove + zMove;
+
+                if (_isSprinting)
+                {
+                    _characterController.Move(move * _movementSpeed * _sprintModifier * Time.deltaTime);
+
+                    if (!_isJumping)
+                    {
+                        _animator.SetFloat("vertical", z * _sprintModifier);
+                        _animator.SetFloat("horizontal", x * _sprintModifier);
+                    }
+                }
                 else
                 {
-                    _playerUI.NormalCrosshair();
+                    _characterController.Move(move * _movementSpeed * Time.deltaTime);
+
+                    if (!_isJumping)
+                    {
+
+                        _animator.SetFloat("vertical", z);
+                        _animator.SetFloat("horizontal", x);
+                    }
                 }
             }
-        }
 
-        #endregion
-
-        #region movement
-
-        IsGroundedCheck();
-
-        if (_isMoving)
-        {
-            float x = _inputMap.Player.Movement.ReadValue<Vector2>().x;
-            float z = _inputMap.Player.Movement.ReadValue<Vector2>().y;
-
-            float camX = _followTransform.rotation.eulerAngles.x;
-
-
-            //set player rotation to be the same as the follow target
-            transform.rotation = Quaternion.Euler(0, _followTransform.rotation.eulerAngles.y, 0);
-
-            //reset target rotation
-            _followTransform.localEulerAngles = new Vector3(camX, 0, 0);
-
-            Vector3 xMove = new Vector3(_followTransform.right.x, 0, _followTransform.right.z) * x;
-            Vector3 zMove = new Vector3(_followTransform.forward.x, 0, _followTransform.forward.z) * z;
-
-            Vector3 move = xMove + zMove;
-
-            if (_isSprinting)
-            {
-                _characterController.Move(move * _movementSpeed * _sprintModifier * Time.deltaTime);
-
-                if (!_isJumping)
-                {
-                    _animator.SetFloat("vertical", z * _sprintModifier);
-                    _animator.SetFloat("horizontal", x * _sprintModifier);
-                }
-            }
             else
             {
-                _characterController.Move(move * _movementSpeed * Time.deltaTime);
-
-                if (!_isJumping)
-                {
-
-                    _animator.SetFloat("vertical", z);
-                    _animator.SetFloat("horizontal", x);
-                }
+                _animator.SetFloat("vertical", 0);
+                _animator.SetFloat("horizontal", 0);
             }
+
+            StartApplyGravity();
+
+            #endregion
         }
-
-        else
-        {
-            _animator.SetFloat("vertical", 0);
-            _animator.SetFloat("horizontal", 0);
-        }
-
-        StartApplyGravity();
-
-        #endregion
     }
 
     private void InitInput()
@@ -244,13 +246,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         {
             GetComponent<CharacterController>().enabled = false;
             _playerCamController.OnDisable();
-            //OnDisable();
+            _isEnabled = false;
         }
         else
         {
             GetComponent<CharacterController>().enabled = true;
             _playerCamController.OnEnable();
-            //OnEnable();
+            _isEnabled = true; ;
         }
     }
 

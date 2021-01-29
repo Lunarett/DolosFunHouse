@@ -19,8 +19,6 @@ public class PlayerUIHandler : MonoBehaviour
 	{
 		_uiPause.SetActive(false);
 		PhotonNetwork.AutomaticallySyncScene = false;
-
-		//OnGamePaused();
 	}
 
 
