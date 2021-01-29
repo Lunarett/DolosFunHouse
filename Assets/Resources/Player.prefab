@@ -1336,7 +1336,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2658583374116589025
 Transform:
   m_ObjectHideFlags: 0
@@ -3767,6 +3767,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 257
   _animator: {fileID: 7211988748970639758}
+  _skinsParent: {fileID: 7211988748628192864}
 --- !u!95 &7211988748970639758
 Animator:
   serializedVersion: 3

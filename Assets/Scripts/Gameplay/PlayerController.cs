@@ -46,11 +46,30 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     //animation
     [SerializeField] private Animator _animator;
 
+    [SerializeField] private GameObject _skinsParent;
+
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
         controller = gameObject.GetComponent<CharacterController>();
         InitInput();
+    }
+
+    private void Start()
+    {
+        if (photonView.IsMine)
+        {
+            int playerPref = PlayerPrefs.GetInt("selectedCharacter", 9);
+
+            photonView.RPC("RPC_SetSkin", RpcTarget.AllBuffered, playerPref);
+            Debug.Log("Found skin" + playerPref);
+        }
+    }
+
+    [PunRPC]
+    private void RPC_SetSkin(int index)
+    {
+        _skinsParent.transform.GetChild(index).gameObject.SetActive(true);
     }
 
     private void FixedUpdate()
@@ -305,6 +324,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-       
+
     }
 }
