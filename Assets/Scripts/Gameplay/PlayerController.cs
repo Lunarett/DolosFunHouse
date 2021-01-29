@@ -21,8 +21,10 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
     [SerializeField] CameraController _playerCamController;
 
 
-    //character controller
+    //character 
     private CharacterController _characterController;
+    [SerializeField] private GameObject _characterMesh;
+    [SerializeField] private GameObject _torch;
 
     //input
     private InputMap _inputMap;
@@ -337,12 +339,12 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
 
     }
 
-    private void OnEnable()
+    public void OnEnable()
     {
         _inputMap.Enable();
     }
 
-    private void OnDisable()
+    public void OnDisable()
     {
         _inputMap.Disable();
     }
@@ -414,8 +416,7 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
 
     public void StartDie()
     {
-
-        photonView.RPC("RPC_Die", RpcTarget.All);
+photonView.RPC("RPC_Die", RpcTarget.All);
     }
     [PunRPC]
     private void RPC_Die()
@@ -424,5 +425,24 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
         Debug.Log("Oh no I just died!!!");
     }
 
+    public void StartDisableMesh()
+    {
+        photonView.RPC("RPC_DisableMesh", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_DisableMesh()
+    {
+        _characterMesh.SetActive(false);
+        _torch.SetActive(false);
+    }
 
+    public void StartActivateMesh()
+    {
+        photonView.RPC("RPC_ActivateMesh", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_ActivateMesh()
+    {
+        _characterMesh.SetActive(true);
+    }
 }
