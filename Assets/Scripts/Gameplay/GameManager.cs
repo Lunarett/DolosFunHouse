@@ -11,7 +11,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [SerializeField] private Transform _spawnPoint;
 
-
     void Start()
     {
         if (!PhotonNetwork.IsConnected)
@@ -22,7 +21,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             SpawnPlayer();
         }
-
     }
 
     /*
