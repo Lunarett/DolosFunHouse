@@ -383,7 +383,7 @@ MonoBehaviour:
   _isKiller: 0
   _startGameButton: {fileID: 936354874}
   _isReadyButton: {fileID: 1801836316}
-  _indexOfFirstKiller: 5
+  _indexOfFirstKiller: 8
   _isReady: 0
   _clientPrefab: {fileID: 1862686839018594725, guid: a635967c870e2438295de85a089bccff, type: 3}
   _clientParent: {fileID: 938410029}
@@ -2084,7 +2084,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1960403810}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 3, y: 1, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

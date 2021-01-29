@@ -29,10 +29,19 @@ public class BarrelScript : Interactible
 
     public void Start()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.OfflineMode = true;
+        }
         _inputMap.Disable();
     }
 
     public override void StartInteract(int playerActorNumber)
+    {
+        photonView.RPC("RPC_Interact", RpcTarget.All, playerActorNumber);
+    }
+    [PunRPC]
+    private void RPC_Interact(int playerActorNumber)
     {
         if (!_isOccupied)
         {
@@ -40,35 +49,27 @@ public class BarrelScript : Interactible
 
             base.StartInteract(player.ActorNumber);
 
-            GameObject playerGameObject = (GameObject)player.TagObject;
+            _player = (GameObject)player.TagObject;
 
-            EnterBarrel(playerGameObject);
+            EnterBarrel();
         }
     }
-    //public override void StartInteract(GameObject playerObject)
-    //{
-    //    base.StartInteract(playerObject);
-
-    //    if (!_isOccupied)
-    //    {
-    //        EnterBarrel(playerObject);
-    //    }
-    //}
 
     private void StartMovePlayer(Vector3 position)
     {
         photonView.RPC("RPC_MovePlayer", RpcTarget.All, position);
+
     }
     [PunRPC]
     private void RPC_MovePlayer(Vector3 position)
     {
         _player.transform.position = position;
     }
-    private void EnterBarrel(GameObject player)
+
+    private void EnterBarrel()
     {
         OnEnable();
         //move player character
-        _player = player;
         StartMovePlayer(transform.position);
         PlayerController playerController = _player.GetComponent<PlayerController>();
 
@@ -87,11 +88,14 @@ public class BarrelScript : Interactible
             StartMovePlayer(_exitTransform.position);
 
             _isOccupied = false;
+
             PlayerController playerController = _player.GetComponent<PlayerController>();
 
-            playerController.ToggleCharacterActive();
+            //playerController.ToggleCharacterActive();
 
             playerController.SwitchActiveCam(_peekCam);
+
+            playerController.ActivateCharacter();
 
             _player = null;
         }
