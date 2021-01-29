@@ -416,7 +416,7 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
 
     public void StartDie()
     {
-photonView.RPC("RPC_Die", RpcTarget.All);
+        photonView.RPC("RPC_Die", RpcTarget.All);
     }
     [PunRPC]
     private void RPC_Die()
@@ -444,5 +444,6 @@ photonView.RPC("RPC_Die", RpcTarget.All);
     private void RPC_ActivateMesh()
     {
         _characterMesh.SetActive(true);
+        _torch.SetActive(true);
     }
 }

@@ -68,19 +68,25 @@ public class BarrelScript : Interactible
 
     private void EnterBarrel()
     {
-        OnEnable();
-        //move player character
-        StartMovePlayer(transform.position);
-        PlayerController playerController = _player.GetComponent<PlayerController>();
+        if (!_isOccupied)
+        {
+            //turn on input
+            OnEnable();
 
-        _isOccupied = true;
+            //move player
+            StartMovePlayer(transform.position);
+            
+            _isOccupied = true;
 
-        //disable player control
-        playerController.ToggleCharacterActive();
+            //disable player control and visible game objects
+            PlayerController playerController = _player.GetComponent<PlayerController>();
 
-        playerController.SwitchActiveCam(_peekCam);
+            playerController.ToggleCharacterActive();
 
-        playerController.StartDisableMesh();
+            playerController.SwitchActiveCam(_peekCam);
+
+            playerController.StartDisableMesh();
+        }
     }
 
     void ExitBarrel()
