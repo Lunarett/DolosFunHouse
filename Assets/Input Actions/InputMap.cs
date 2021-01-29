@@ -192,6 +192,202 @@ public class @InputMap : IInputActionCollection, IDisposable
             ]
         },
         {
+            ""name"": ""Killer"",
+            ""id"": ""78308171-3f2f-4262-bb02-657c8c1941aa"",
+            ""actions"": [
+                {
+                    ""name"": ""Movement"",
+                    ""type"": ""Button"",
+                    ""id"": ""f63f2918-aa9b-427d-9dce-8636ed1a2921"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""2b8c7e79-9737-43e3-9c81-37021833b976"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""4604a0f0-3aea-4609-be92-b64688188a08"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""2367ba2e-3e82-4d87-bf79-bb9e0f53dc3e"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""Escape"",
+                    ""type"": ""Button"",
+                    ""id"": ""eb9b1e54-080b-44e8-ac1e-095f70c8a9a8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""Button"",
+                    ""id"": ""c5e3a2c3-417a-43a2-8552-c69176d016e1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""Kill"",
+                    ""type"": ""Button"",
+                    ""id"": ""ce979a9e-ab55-42ec-b81c-6a8df95d6747"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""WASD"",
+                    ""id"": ""2ab3ffbc-5da4-4889-a7df-f32d111e328a"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": ""Press(behavior=2)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""2cf06359-b88e-4529-9de4-66e85addf2fa"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""697b0a6a-559b-4358-8e7e-e2c3e7663bff"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""dfc568af-02e9-4205-8d40-b7ae8aef4bcd"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""54c17f3e-ad37-4af8-b6e2-70c20685726a"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cc81d155-c6ec-416f-921e-b7d530951ee1"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ce4015ea-176d-4927-86c3-4ac1188d0b1b"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""510101e9-b883-4c24-8b71-aaaa93992feb"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d8de1a73-fe99-4ec3-bf94-93a359de3e82"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Escape"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""51e4bd96-f611-4c40-ad43-4fe509cb22e5"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""de7d0154-152c-4cff-9962-61dd780509f0"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""98332f2d-33ee-4640-ba84-e388d814f212"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""Kill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
             ""name"": ""Barrel"",
             ""id"": ""229c2faf-830d-43c7-88cd-efe3645a68fa"",
             ""actions"": [
@@ -265,6 +461,15 @@ public class @InputMap : IInputActionCollection, IDisposable
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Escape = m_Player.FindAction("Escape", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        // Killer
+        m_Killer = asset.FindActionMap("Killer", throwIfNotFound: true);
+        m_Killer_Movement = m_Killer.FindAction("Movement", throwIfNotFound: true);
+        m_Killer_Interact = m_Killer.FindAction("Interact", throwIfNotFound: true);
+        m_Killer_Jump = m_Killer.FindAction("Jump", throwIfNotFound: true);
+        m_Killer_Look = m_Killer.FindAction("Look", throwIfNotFound: true);
+        m_Killer_Escape = m_Killer.FindAction("Escape", throwIfNotFound: true);
+        m_Killer_Sprint = m_Killer.FindAction("Sprint", throwIfNotFound: true);
+        m_Killer_Kill = m_Killer.FindAction("Kill", throwIfNotFound: true);
         // Barrel
         m_Barrel = asset.FindActionMap("Barrel", throwIfNotFound: true);
         m_Barrel_Leave = m_Barrel.FindAction("Leave", throwIfNotFound: true);
@@ -388,6 +593,87 @@ public class @InputMap : IInputActionCollection, IDisposable
     }
     public PlayerActions @Player => new PlayerActions(this);
 
+    // Killer
+    private readonly InputActionMap m_Killer;
+    private IKillerActions m_KillerActionsCallbackInterface;
+    private readonly InputAction m_Killer_Movement;
+    private readonly InputAction m_Killer_Interact;
+    private readonly InputAction m_Killer_Jump;
+    private readonly InputAction m_Killer_Look;
+    private readonly InputAction m_Killer_Escape;
+    private readonly InputAction m_Killer_Sprint;
+    private readonly InputAction m_Killer_Kill;
+    public struct KillerActions
+    {
+        private @InputMap m_Wrapper;
+        public KillerActions(@InputMap wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Movement => m_Wrapper.m_Killer_Movement;
+        public InputAction @Interact => m_Wrapper.m_Killer_Interact;
+        public InputAction @Jump => m_Wrapper.m_Killer_Jump;
+        public InputAction @Look => m_Wrapper.m_Killer_Look;
+        public InputAction @Escape => m_Wrapper.m_Killer_Escape;
+        public InputAction @Sprint => m_Wrapper.m_Killer_Sprint;
+        public InputAction @Kill => m_Wrapper.m_Killer_Kill;
+        public InputActionMap Get() { return m_Wrapper.m_Killer; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(KillerActions set) { return set.Get(); }
+        public void SetCallbacks(IKillerActions instance)
+        {
+            if (m_Wrapper.m_KillerActionsCallbackInterface != null)
+            {
+                @Movement.started -= m_Wrapper.m_KillerActionsCallbackInterface.OnMovement;
+                @Movement.performed -= m_Wrapper.m_KillerActionsCallbackInterface.OnMovement;
+                @Movement.canceled -= m_Wrapper.m_KillerActionsCallbackInterface.OnMovement;
+                @Interact.started -= m_Wrapper.m_KillerActionsCallbackInterface.OnInteract;
+                @Interact.performed -= m_Wrapper.m_KillerActionsCallbackInterface.OnInteract;
+                @Interact.canceled -= m_Wrapper.m_KillerActionsCallbackInterface.OnInteract;
+                @Jump.started -= m_Wrapper.m_KillerActionsCallbackInterface.OnJump;
+                @Jump.performed -= m_Wrapper.m_KillerActionsCallbackInterface.OnJump;
+                @Jump.canceled -= m_Wrapper.m_KillerActionsCallbackInterface.OnJump;
+                @Look.started -= m_Wrapper.m_KillerActionsCallbackInterface.OnLook;
+                @Look.performed -= m_Wrapper.m_KillerActionsCallbackInterface.OnLook;
+                @Look.canceled -= m_Wrapper.m_KillerActionsCallbackInterface.OnLook;
+                @Escape.started -= m_Wrapper.m_KillerActionsCallbackInterface.OnEscape;
+                @Escape.performed -= m_Wrapper.m_KillerActionsCallbackInterface.OnEscape;
+                @Escape.canceled -= m_Wrapper.m_KillerActionsCallbackInterface.OnEscape;
+                @Sprint.started -= m_Wrapper.m_KillerActionsCallbackInterface.OnSprint;
+                @Sprint.performed -= m_Wrapper.m_KillerActionsCallbackInterface.OnSprint;
+                @Sprint.canceled -= m_Wrapper.m_KillerActionsCallbackInterface.OnSprint;
+                @Kill.started -= m_Wrapper.m_KillerActionsCallbackInterface.OnKill;
+                @Kill.performed -= m_Wrapper.m_KillerActionsCallbackInterface.OnKill;
+                @Kill.canceled -= m_Wrapper.m_KillerActionsCallbackInterface.OnKill;
+            }
+            m_Wrapper.m_KillerActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Movement.started += instance.OnMovement;
+                @Movement.performed += instance.OnMovement;
+                @Movement.canceled += instance.OnMovement;
+                @Interact.started += instance.OnInteract;
+                @Interact.performed += instance.OnInteract;
+                @Interact.canceled += instance.OnInteract;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
+                @Look.started += instance.OnLook;
+                @Look.performed += instance.OnLook;
+                @Look.canceled += instance.OnLook;
+                @Escape.started += instance.OnEscape;
+                @Escape.performed += instance.OnEscape;
+                @Escape.canceled += instance.OnEscape;
+                @Sprint.started += instance.OnSprint;
+                @Sprint.performed += instance.OnSprint;
+                @Sprint.canceled += instance.OnSprint;
+                @Kill.started += instance.OnKill;
+                @Kill.performed += instance.OnKill;
+                @Kill.canceled += instance.OnKill;
+            }
+        }
+    }
+    public KillerActions @Killer => new KillerActions(this);
+
     // Barrel
     private readonly InputActionMap m_Barrel;
     private IBarrelActions m_BarrelActionsCallbackInterface;
@@ -445,6 +731,16 @@ public class @InputMap : IInputActionCollection, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnEscape(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
+    }
+    public interface IKillerActions
+    {
+        void OnMovement(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
+        void OnEscape(InputAction.CallbackContext context);
+        void OnSprint(InputAction.CallbackContext context);
+        void OnKill(InputAction.CallbackContext context);
     }
     public interface IBarrelActions
     {
