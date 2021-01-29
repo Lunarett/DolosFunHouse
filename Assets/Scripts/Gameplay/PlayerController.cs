@@ -245,7 +245,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         if (GetComponent<CharacterController>().enabled)
         {
             GetComponent<CharacterController>().enabled = false;
-            _playerCamController.OnDisable();
+            OnDisable();
             _isEnabled = false;
         }
         else

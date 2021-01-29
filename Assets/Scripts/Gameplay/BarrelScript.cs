@@ -29,6 +29,10 @@ public class BarrelScript : Interactible
 
     public void Start()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.OfflineMode = true;
+        }
         _inputMap.Disable();
     }
 
@@ -57,13 +61,19 @@ public class BarrelScript : Interactible
 
     private void StartMovePlayer(Vector3 position)
     {
-        photonView.RPC("RPC_MovePlayer", RpcTarget.All, position);
+        if (PhotonNetwork.OfflineMode)
+            _player.transform.position = position;
+
+        else
+            photonView.RPC("RPC_MovePlayer", RpcTarget.All, position.x, position.y, position.y);
+
     }
     [PunRPC]
-    private void RPC_MovePlayer(Vector3 position)
+    private void RPC_MovePlayer(int positionX, int positionY, int positionZ)
     {
-        _player.transform.position = position;
+        _player.transform.position = new Vector3(positionX, positionY, positionZ);
     }
+
     private void EnterBarrel(GameObject player)
     {
         OnEnable();
