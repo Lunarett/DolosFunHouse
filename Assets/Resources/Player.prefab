@@ -5151,6 +5151,8 @@ MonoBehaviour:
   _virtualCam: {fileID: 7211988748355484500}
   _followTransform: {fileID: 7211988748235639952}
   _playerCamController: {fileID: 7211988749032452539}
+  _characterMesh: {fileID: 7211988748628192864}
+  _torch: {fileID: 22882366220653157}
   _movementSpeed: 4
   _jumpHeight: 2
   _groundCheck: {fileID: 4345396818131194180}
@@ -6920,5 +6922,10 @@ PrefabInstance:
 --- !u!4 &22882366220900033 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6184704648997295908, guid: 68fb625fa899b4aeabb1b4eaa95a0da3, type: 3}
+  m_PrefabInstance: {fileID: 6162392654501331429}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &22882366220653157 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6184704648997540736, guid: 68fb625fa899b4aeabb1b4eaa95a0da3, type: 3}
   m_PrefabInstance: {fileID: 6162392654501331429}
   m_PrefabAsset: {fileID: 0}

@@ -68,17 +68,25 @@ public class BarrelScript : Interactible
 
     private void EnterBarrel()
     {
-        OnEnable();
-        //move player character
-        StartMovePlayer(transform.position);
-        PlayerController playerController = _player.GetComponent<PlayerController>();
+        if (!_isOccupied)
+        {
+            //turn on input
+            OnEnable();
 
-        _isOccupied = true;
+            //move player
+            StartMovePlayer(transform.position);
+            
+            _isOccupied = true;
 
-        //disable player control
-        playerController.ToggleCharacterActive();
+            //disable player control and visible game objects
+            PlayerController playerController = _player.GetComponent<PlayerController>();
 
-        playerController.SwitchActiveCam(_peekCam);
+            playerController.ToggleCharacterActive();
+
+            playerController.SwitchActiveCam(_peekCam);
+
+            playerController.StartDisableMesh();
+        }
     }
 
     void ExitBarrel()
@@ -97,6 +105,8 @@ public class BarrelScript : Interactible
 
             playerController.ActivateCharacter();
 
+            playerController.StartActivateMesh();
+
             _player = null;
         }
         else
@@ -104,6 +114,7 @@ public class BarrelScript : Interactible
             Debug.Log(gameObject.name + " missing exit transform!");
         }
         OnDisable();
+        _inputMap.Disable();
     }
 
     private void CamFollowMouse(Vector2 mouseInput)
@@ -125,12 +136,12 @@ public class BarrelScript : Interactible
         _inputMap.Barrel.Leave.performed += context => ExitBarrel();
     }
 
-    private void OnEnable()
+    public void OnEnable()
     {
         _inputMap.Enable();
     }
 
-    private void OnDisable()
+    public void OnDisable()
     {
         _inputMap.Disable();
     }
