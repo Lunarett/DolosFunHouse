@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Photon.Pun;
 
-public class PlayerController : MonoBehaviourPun, IPunObservable
+public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiateMagicCallback
 {
     //selection
     [SerializeField] private Material _highlightMaterial;
@@ -18,7 +18,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     [SerializeField] Camera _playerCam;
     [SerializeField] GameObject _virtualCam;
     [SerializeField] Transform _followTransform;
-
 
 
     //character controller
@@ -270,7 +269,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void StartSprint()
     {
-        photonView.RPC("RPC_Sprint", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("RPC_Sprint", RpcTarget.All);
+        }
     }
     [PunRPC]
     private void RPC_Sprint()
@@ -308,7 +310,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void StartInteract()
     {
-        photonView.RPC("RPC_Interact", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("RPC_Interact", RpcTarget.All);
+        }
     }
     [PunRPC]
     private void RPC_Interact()
@@ -318,7 +323,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             if ((interactible = _selection.GetComponent<Interactible>()) != null)
             {
-                interactible.Interact(gameObject);
+                interactible.StartInteract(photonView.ControllerActorNr);
             }
         }
     }
@@ -326,5 +331,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
 
+    }
+
+    //so here we give the PhotonPlayer the gameObject as TagObject so that we can get the gameObject through the viewActorNumber later
+    //some links:
+    //https://forum.photonengine.com/discussion/12564/pun-2-onphotoninstantiate-isnt-being-called
+    //https://forum.photonengine.com/discussion/6432/tagobject-usage
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        info.Sender.TagObject = gameObject;
     }
 }
