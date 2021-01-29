@@ -5,7 +5,6 @@ using Photon.Pun;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
-    private PlayerController[] _players;
     [SerializeField] private GameObject _playerPrefab;
 
     [SerializeField] private Transform _spawnPoint;
@@ -49,7 +48,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.OfflineMode)
         {
-            PlayerController player = SpawnPlayer().GetComponent<PlayerController>();
+            
         }
     }
 }

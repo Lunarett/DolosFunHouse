@@ -199,16 +199,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         _inputMap.Player.Interact.performed += context => StartInteract();
         _inputMap.Player.Sprint.performed += context => StartSprint();
         _inputMap.Player.Sprint.canceled += context => StartSprint();
-        _inputMap.Player.Escape.performed += context => TestEscape();
+        _inputMap.Player.Escape.performed += context => EscapeMenu();
 
         //is killer
         //...
         _inputMap.Killer.Kill.performed += context => Kill();
     }
 
-    private void TestEscape()
+    private void EscapeMenu()
     {
-        Debug.Log("ESCAPE");
         _playerUI.OnGamePaused();
         ToggleCharacterActive();
     }
@@ -245,15 +244,20 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         if (GetComponent<CharacterController>().enabled)
         {
             GetComponent<CharacterController>().enabled = false;
-            OnDisable();
             _isEnabled = false;
+            _playerCamController.OnDisable();
         }
         else
         {
-            GetComponent<CharacterController>().enabled = true;
-            _playerCamController.OnEnable();
-            _isEnabled = true; ;
+            ActivateCharacter();
         }
+    }
+
+    public void ActivateCharacter()
+    {
+        GetComponent<CharacterController>().enabled = true;
+        _playerCamController.OnEnable();
+        _isEnabled = true;
     }
 
     public void SwitchActiveCam(Camera otherCam)
@@ -287,7 +291,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
     [PunRPC]
     private void RPC_Jump()
     {
-
         IsGroundedCheck();
 
         if (_isGrounded)
@@ -420,4 +423,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
         Debug.Log("Oh no I just died!!!");
     }
+
+
 }
