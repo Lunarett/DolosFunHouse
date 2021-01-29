@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Photon.Pun;
 
-public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiateMagicCallback
+public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, IPunObservable
 {
     //selection
     [SerializeField] private Material _highlightMaterial;

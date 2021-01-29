@@ -38,47 +38,38 @@ public class BarrelScript : Interactible
 
     public override void StartInteract(int playerActorNumber)
     {
+        photonView.RPC("RPC_Interact", RpcTarget.All, playerActorNumber);
+    }
+    [PunRPC]
+    private void RPC_Interact(int playerActorNumber)
+    {
         if (!_isOccupied)
         {
             Player player = PhotonNetwork.CurrentRoom.GetPlayer(playerActorNumber);
 
             base.StartInteract(player.ActorNumber);
 
-            GameObject playerGameObject = (GameObject)player.TagObject;
+            _player = (GameObject)player.TagObject;
 
-            EnterBarrel(playerGameObject);
+            EnterBarrel();
         }
     }
-    //public override void StartInteract(GameObject playerObject)
-    //{
-    //    base.StartInteract(playerObject);
-
-    //    if (!_isOccupied)
-    //    {
-    //        EnterBarrel(playerObject);
-    //    }
-    //}
 
     private void StartMovePlayer(Vector3 position)
     {
-        if (PhotonNetwork.OfflineMode)
-            _player.transform.position = position;
-
-        else
-            photonView.RPC("RPC_MovePlayer", RpcTarget.All, position.x, position.y, position.y);
+        photonView.RPC("RPC_MovePlayer", RpcTarget.All, position);
 
     }
     [PunRPC]
-    private void RPC_MovePlayer(int positionX, int positionY, int positionZ)
+    private void RPC_MovePlayer(Vector3 position)
     {
-        _player.transform.position = new Vector3(positionX, positionY, positionZ);
+        _player.transform.position = position;
     }
 
-    private void EnterBarrel(GameObject player)
+    private void EnterBarrel()
     {
         OnEnable();
         //move player character
-        _player = player;
         StartMovePlayer(transform.position);
         PlayerController playerController = _player.GetComponent<PlayerController>();
 
@@ -97,11 +88,14 @@ public class BarrelScript : Interactible
             StartMovePlayer(_exitTransform.position);
 
             _isOccupied = false;
+
             PlayerController playerController = _player.GetComponent<PlayerController>();
 
-            playerController.ToggleCharacterActive();
+            //playerController.ToggleCharacterActive();
 
             playerController.SwitchActiveCam(_peekCam);
+
+            playerController.ActivateCharacter();
 
             _player = null;
         }
