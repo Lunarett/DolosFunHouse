@@ -54,9 +54,6 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
     //UI
     [SerializeField] PlayerUIHandler _playerUI;
 
-    //test
-    [SerializeField] private string myName;
-
     [SerializeField] private GameObject _skinsParent;
 
     private void Awake()
@@ -115,14 +112,6 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
                         {
                             ApplyHighlight(hit);
                         }
-                        else if (hit.transform.CompareTag("Player"))
-                        {
-                            _playerUI.SelectedCrosshair();
-                        }
-                        else
-                        {
-                            _playerUI.NormalCrosshair();
-                        }
                     }
                     else
                     {
@@ -130,7 +119,6 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
                     }
                 }
             }
-
             #endregion
 
             #region movement
@@ -206,6 +194,7 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
         //is killer
         //...
         _inputMap.Killer.Kill.performed += context => Kill();
+
     }
 
     private void EscapeMenu()
@@ -423,6 +412,8 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
     {
 
         Debug.Log("Oh no I just died!!!");
+        _characterMesh.SetActive(false);
+        _torch.SetActive(false);
     }
 
     public void StartDisableMesh()
@@ -434,6 +425,7 @@ public class PlayerController : MonoBehaviourPun, IPunInstantiateMagicCallback, 
     {
         _characterMesh.SetActive(false);
         _torch.SetActive(false);
+        _playerCam.gameObject.SetActive(false);
     }
 
     public void StartActivateMesh()
