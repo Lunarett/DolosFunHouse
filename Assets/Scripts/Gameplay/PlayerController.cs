@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
     [SerializeField] Camera _playerCam;
     [SerializeField] GameObject _virtualCam;
     [SerializeField] Transform _followTransform;
+    [SerializeField] CameraController _playerCamController;
 
 
     //character controller
@@ -25,6 +26,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
     //input
     private InputMap _inputMap;
+    private bool _isEnabled = true; //determines wether code accepts input
 
     //movement
     [SerializeField] private float _movementSpeed = 8f;
@@ -195,10 +197,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         _inputMap.Player.Interact.performed += context => StartInteract();
         _inputMap.Player.Sprint.performed += context => StartSprint();
         _inputMap.Player.Sprint.canceled += context => StartSprint();
+        _inputMap.Player.Escape.performed += context => TestEscape();
 
         //is killer
         //...
         _inputMap.Killer.Kill.performed += context => Kill();
+    }
+
+    private void TestEscape()
+    {
+        Debug.Log("ESCAPE");
+        _playerUI.OnGamePaused();
+        ToggleCharacterActive();
     }
 
     private void ApplyHighlight(RaycastHit hit)
@@ -228,23 +238,19 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         }
     }
 
-    public void StartToggleCharacterActive()
-    {
-        photonView.RPC("RPC_ToggleCharacterActive", RpcTarget.All);
-    }
-
-    [PunRPC]
-    public void RPC_ToggleCharacterActive()
+    public void ToggleCharacterActive()
     {
         if (GetComponent<CharacterController>().enabled)
         {
             GetComponent<CharacterController>().enabled = false;
-            OnDisable();
+            _playerCamController.OnDisable();
+            //OnDisable();
         }
         else
         {
             GetComponent<CharacterController>().enabled = true;
-            OnEnable();
+            _playerCamController.OnEnable();
+            //OnEnable();
         }
     }
 
@@ -256,7 +262,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
     private void Move()
     {
-
         _isMoving = !_isMoving;
     }
 
@@ -388,12 +393,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
                     PlayerController victimController = hit.transform.gameObject.GetComponent<PlayerController>();
 
                     //this is if we hit the player from the front, the ray will hit the physical interaction zone
-                    if(victimController == null)
+                    if (victimController == null)
                     {
                         victimController = hit.transform.GetComponentInParent<PlayerController>();
                     }
 
-                    if(victimController != this)
+                    if (victimController != this)
                     {
                         victimController.StartDie();
                     }
@@ -404,8 +409,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
     public void StartDie()
     {
-        
-            photonView.RPC("RPC_Die", RpcTarget.All);
+
+        photonView.RPC("RPC_Die", RpcTarget.All);
     }
     [PunRPC]
     private void RPC_Die()

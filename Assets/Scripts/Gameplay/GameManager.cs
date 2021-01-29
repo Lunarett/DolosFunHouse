@@ -44,16 +44,16 @@ public class GameManager : MonoBehaviourPunCallbacks
         Debug.Log("Spawned " + ammount + " players.");
     } */
 
-    public void SpawnPlayer()
+    public GameObject SpawnPlayer()
     {
         if (PhotonNetwork.IsConnected)
         {
-            PhotonNetwork.Instantiate(_playerPrefab.name, _spawnPoint.position, Quaternion.identity);
+            return PhotonNetwork.Instantiate(_playerPrefab.name, _spawnPoint.position, Quaternion.identity);
         }
         else
         {
-            Instantiate(_playerPrefab, _spawnPoint.position, Quaternion.identity);
             Debug.Log("couldn't connect to photon network");
+            return Instantiate(_playerPrefab, _spawnPoint.position, Quaternion.identity);
         }
     }
 
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.OfflineMode)
         {
-            SpawnPlayer();
+            PlayerController player = SpawnPlayer().GetComponent<PlayerController>();
         }
     }
 }

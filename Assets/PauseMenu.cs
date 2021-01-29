@@ -26,6 +26,7 @@ public class PauseMenu : MonoBehaviour
 
 	public void OnGamePaused()
 	{
+		Debug.Log("GAMEPAUSED");
 		if(!_isPaused)
 		{
 			_isPaused = true;
