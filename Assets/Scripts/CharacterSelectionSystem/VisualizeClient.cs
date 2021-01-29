@@ -73,7 +73,7 @@ public class VisualizeClient : MonoBehaviour
 
         for (int i = 0; i < _characterPrefabs.Length; i++)
         {
-            _characters[i] = Instantiate(_characterPrefabs[i], Vector3.right * index, Quaternion.Euler(0,180,0));
+            _characters[i] = Instantiate(_characterPrefabs[i], Vector3.right * index, Quaternion.identity);
             _characters[i].SetActive(false);
         }
     }

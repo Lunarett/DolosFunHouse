@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Photon.Pun;
 
-public class PlayerController : MonoBehaviourPun, IPunObservable
+public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiateMagicCallback
 {
     //selection
     [SerializeField] private Material _highlightMaterial;
@@ -16,14 +16,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     //camera
     [SerializeField] Camera _playerCam;
+    [SerializeField] GameObject _virtualCam;
     [SerializeField] Transform _followTransform;
+    [SerializeField] CameraController _playerCamController;
 
 
     //character controller
-    private CharacterController controller;
+    private CharacterController _characterController;
 
     //input
     private InputMap _inputMap;
+    private bool _isEnabled = true; //determines wether code accepts input
 
     //movement
     [SerializeField] private float _movementSpeed = 8f;
@@ -46,12 +49,28 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     //animation
     [SerializeField] private Animator _animator;
 
+    //UI
+    [SerializeField] PlayerUIHandler _playerUI;
+
+    //test
+    [SerializeField] private string myName;
+
     [SerializeField] private GameObject _skinsParent;
 
     private void Awake()
     {
+        if (!photonView.IsMine)
+        {
+            return;
+        }
+
+        _playerCam.gameObject.SetActive(true);
+        _virtualCam.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
-        controller = gameObject.GetComponent<CharacterController>();
+        _characterController = gameObject.GetComponent<CharacterController>();
+
+        myName = photonView.Owner.NickName;
+
         InitInput();
     }
 
@@ -65,7 +84,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             Debug.Log("Found skin" + playerPref);
         }
     }
-
     [PunRPC]
     private void RPC_SetSkin(int index)
     {
@@ -74,98 +92,124 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void FixedUpdate()
     {
-        if (!photonView.AmOwner)
+        if (!photonView.IsMine)
             return;
-
-        #region Interaction
-
-        RemoveHighlight();
-
-        if (_playerCam.gameObject.activeSelf)
+        if (_isEnabled)
         {
-            //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
-            Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+            #region Interaction
 
-            //ray cast will ignore everything on the player layer because of the ~
-            if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, ~_playerLayer))
+            RemoveHighlight();
+
+            if (_playerCam.gameObject.activeSelf)
             {
-                if (hit.distance <= _maxInsteractDistance && hit.transform.CompareTag("Selectable"))
+                Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+
+                //ray cast will ignore everything on the player layer because of the ~
+                if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, ~_playerLayer))
                 {
-                    //show UI
-                    //....
-                    RemoveHighlight();
-                    ApplyHighlight(hit);
+                    if (hit.distance <= _maxInsteractDistance)
+                    {
+                        if (hit.transform.CompareTag("Selectable"))
+                        {
+                            ApplyHighlight(hit);
+                        }
+                        else if (hit.transform.CompareTag("Player"))
+                        {
+                            _playerUI.SelectedCrosshair();
+                        }
+                        else
+                        {
+                            _playerUI.NormalCrosshair();
+                        }
+                    }
+                    else
+                    {
+                        _playerUI.NormalCrosshair();
+                    }
                 }
             }
-        }
 
-        #endregion
+            #endregion
 
-        #region movement
+            #region movement
 
-        IsGroundedCheck();
+            IsGroundedCheck();
 
-        if (_isMoving)
-        {
-            float x = _inputMap.Player.Movement.ReadValue<Vector2>().x;
-            float z = _inputMap.Player.Movement.ReadValue<Vector2>().y;
-
-            float camX = _followTransform.rotation.eulerAngles.x;
-
-
-            //set player rotation to be the same as the follow target
-            transform.rotation = Quaternion.Euler(0, _followTransform.rotation.eulerAngles.y, 0);
-
-            //reset target rotation
-            _followTransform.localEulerAngles = new Vector3(camX, 0, 0);
-
-            Vector3 xMove = new Vector3(_followTransform.right.x, 0, _followTransform.right.z) * x;
-            Vector3 zMove = new Vector3(_followTransform.forward.x, 0, _followTransform.forward.z) * z;
-
-            Vector3 move = xMove + zMove;
-
-            if (_isSprinting)
+            if (_isMoving)
             {
-                controller.Move(move * _movementSpeed * _sprintModifier * Time.deltaTime);
+                float x = _inputMap.Player.Movement.ReadValue<Vector2>().x;
+                float z = _inputMap.Player.Movement.ReadValue<Vector2>().y;
 
-                if (!_isJumping)
+                float camX = _followTransform.rotation.eulerAngles.x;
+
+
+                //set player rotation to be the same as the follow target
+                transform.rotation = Quaternion.Euler(0, _followTransform.rotation.eulerAngles.y, 0);
+
+                //reset target rotation
+                _followTransform.localEulerAngles = new Vector3(camX, 0, 0);
+
+                Vector3 xMove = new Vector3(_followTransform.right.x, 0, _followTransform.right.z) * x;
+                Vector3 zMove = new Vector3(_followTransform.forward.x, 0, _followTransform.forward.z) * z;
+
+                Vector3 move = xMove + zMove;
+
+                if (_isSprinting)
                 {
-                    _animator.SetFloat("vertical", z * _sprintModifier);
-                    _animator.SetFloat("horizontal", x * _sprintModifier);
+                    _characterController.Move(move * _movementSpeed * _sprintModifier * Time.deltaTime);
+
+                    if (!_isJumping)
+                    {
+                        _animator.SetFloat("vertical", z * _sprintModifier);
+                        _animator.SetFloat("horizontal", x * _sprintModifier);
+                    }
+                }
+                else
+                {
+                    _characterController.Move(move * _movementSpeed * Time.deltaTime);
+
+                    if (!_isJumping)
+                    {
+
+                        _animator.SetFloat("vertical", z);
+                        _animator.SetFloat("horizontal", x);
+                    }
                 }
             }
+
             else
             {
-                controller.Move(move * _movementSpeed * Time.deltaTime);
-
-                if (!_isJumping)
-                {
-
-                    _animator.SetFloat("vertical", z);
-                    _animator.SetFloat("horizontal", x);
-                }
+                _animator.SetFloat("vertical", 0);
+                _animator.SetFloat("horizontal", 0);
             }
+
+            StartApplyGravity();
+
+            #endregion
         }
-
-        else
-        {
-            _animator.SetFloat("vertical", 0);
-            _animator.SetFloat("horizontal", 0);
-        }
-
-        StartApplyGravity();
-
-        #endregion
     }
 
     private void InitInput()
     {
         _inputMap = new InputMap();
-        _inputMap.Player.Movement.performed += context => StartMove();
+
+        //is survivor
+        _inputMap.Player.Movement.performed += context => Move();
         _inputMap.Player.Jump.performed += context => StartJump();
         _inputMap.Player.Interact.performed += context => StartInteract();
         _inputMap.Player.Sprint.performed += context => StartSprint();
         _inputMap.Player.Sprint.canceled += context => StartSprint();
+        _inputMap.Player.Escape.performed += context => EscapeMenu();
+
+        //is killer
+        //...
+        _inputMap.Killer.Kill.performed += context => Kill();
+    }
+
+    private void EscapeMenu()
+    {
+        _playerUI.OnGamePaused();
+        ToggleCharacterActive();
     }
 
     private void ApplyHighlight(RaycastHit hit)
@@ -178,6 +222,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             _defaultMaterial = _selectionRenderer.material;
             _selectionRenderer.material = _highlightMaterial;
+
+            _playerUI.SelectedCrosshair();
         }
     }
 
@@ -188,27 +234,30 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             _selectionRenderer.material = _defaultMaterial;
             _selection = null;
             _selectionRenderer = null;
+
+            _playerUI.NormalCrosshair();
         }
     }
 
-    public void StartToggleCharacterActive()
-    {
-        photonView.RPC("RPC_ToggleCharacterActive", RpcTarget.All);
-    }
-
-    [PunRPC]
-    public void RPC_ToggleCharacterActive()
+    public void ToggleCharacterActive()
     {
         if (GetComponent<CharacterController>().enabled)
         {
             GetComponent<CharacterController>().enabled = false;
-            OnDisable();
+            _isEnabled = false;
+            _playerCamController.OnDisable();
         }
         else
         {
-            GetComponent<CharacterController>().enabled = true;
-            OnEnable();
+            ActivateCharacter();
         }
+    }
+
+    public void ActivateCharacter()
+    {
+        GetComponent<CharacterController>().enabled = true;
+        _playerCamController.OnEnable();
+        _isEnabled = true;
     }
 
     public void SwitchActiveCam(Camera otherCam)
@@ -217,17 +266,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         otherCam.gameObject.SetActive(!otherCam.gameObject.activeSelf);
     }
 
-    private void StartMove()
+    private void Move()
     {
-        photonView.RPC("RPC_Move", RpcTarget.All);
-    }
-    [PunRPC]
-    private void RPC_Move()
-    {
-        if (controller.enabled)
-        {
-            _isMoving = !_isMoving;
-        }
+        _isMoving = !_isMoving;
     }
 
     private void IsGroundedCheck()
@@ -242,7 +283,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void StartJump()
     {
-        photonView.RPC("RPC_Jump", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("RPC_Jump", RpcTarget.All);
+        }
     }
     [PunRPC]
     private void RPC_Jump()
@@ -255,11 +299,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             _animator.SetTrigger("Jump");
             _isJumping = true;
         }
+
     }
 
     private void StartSprint()
     {
-        photonView.RPC("RPC_Sprint", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("RPC_Sprint", RpcTarget.All);
+        }
     }
     [PunRPC]
     private void RPC_Sprint()
@@ -269,15 +317,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void StartApplyGravity()
     {
-        photonView.RPC("RPC_ApplyGravity", RpcTarget.All);
+        if (photonView.IsMine)
+            photonView.RPC("RPC_ApplyGravity", RpcTarget.All);
     }
     [PunRPC]
     private void RPC_ApplyGravity()
     {
-        if (controller.enabled)
+        if (photonView.IsMine)
         {
             _velocity += _gravity * Time.deltaTime;
-            controller.Move(_velocity * Time.deltaTime);
+            // probably causes an error
+            _characterController.Move(_velocity * Time.deltaTime);
 
             if (_isGrounded && _velocity.y < 0)
             {
@@ -300,7 +350,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void StartInteract()
     {
-        photonView.RPC("RPC_Interact", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            photonView.RPC("RPC_Interact", RpcTarget.All);
+        }
     }
     [PunRPC]
     private void RPC_Interact()
@@ -310,20 +363,66 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             if ((interactible = _selection.GetComponent<Interactible>()) != null)
             {
-                interactible.Interact(gameObject);
+                interactible.StartInteract(photonView.ControllerActorNr);
             }
         }
-    }
-
-    public void OnDrawGizmos()
-    {
-        //Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
-
-        //Gizmos.DrawRay(ray);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
 
     }
+
+    //here we give the PhotonPlayer the gameObject as TagObject so that we can get the player gameObject through the viewActorNumber later
+    //some links:
+    //https://forum.photonengine.com/discussion/12564/pun-2-onphotoninstantiate-isnt-being-called
+    //https://forum.photonengine.com/discussion/6432/tagobject-usage
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        info.Sender.TagObject = gameObject;
+    }
+
+    private void Kill()
+    {
+        if (_playerCam.gameObject.activeSelf)
+        {
+            Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, _playerLayer))
+            {
+                if (hit.distance <= _maxInsteractDistance && hit.transform.CompareTag("Player"))
+                {
+                    Debug.Log("Kill Player");
+                    //since we might hit different parts of the player we first go to the parent and then search it's children. 
+                    //This way we also find the controller when it is in a sibling
+                    PlayerController victimController = hit.transform.gameObject.GetComponent<PlayerController>();
+
+                    //this is if we hit the player from the front, the ray will hit the physical interaction zone
+                    if (victimController == null)
+                    {
+                        victimController = hit.transform.GetComponentInParent<PlayerController>();
+                    }
+
+                    if (victimController != this)
+                    {
+                        victimController.StartDie();
+                    }
+                }
+            }
+        }
+    }
+
+    public void StartDie()
+    {
+
+        photonView.RPC("RPC_Die", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_Die()
+    {
+
+        Debug.Log("Oh no I just died!!!");
+    }
+
+
 }

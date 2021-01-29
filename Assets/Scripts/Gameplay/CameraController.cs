@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float _xRotClamp = 90f;
     [SerializeField] private Transform _followTarget;
 
+    private bool _isEnabled;
     //input
     private InputMap _inputMap;
 
@@ -66,4 +67,6 @@ public class CameraController : MonoBehaviour
 
         return Mathf.Min(angle, to);
     }
+
+    
 }

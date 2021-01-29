@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using Photon.Pun;
+using Photon.Realtime;
 
 
 public class BarrelScript : Interactible
@@ -27,49 +29,77 @@ public class BarrelScript : Interactible
 
     public void Start()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.OfflineMode = true;
+        }
         _inputMap.Disable();
     }
 
-    public override void Interact(GameObject playerObject)
+    public override void StartInteract(int playerActorNumber)
     {
-        base.Interact(playerObject);
-
         if (!_isOccupied)
         {
-            EnterBarrel(playerObject);
+            Player player = PhotonNetwork.CurrentRoom.GetPlayer(playerActorNumber);
+
+            base.StartInteract(player.ActorNumber);
+
+            GameObject playerGameObject = (GameObject)player.TagObject;
+
+            EnterBarrel(playerGameObject);
         }
     }
+    //public override void StartInteract(GameObject playerObject)
+    //{
+    //    base.StartInteract(playerObject);
 
-    private void MovePlayer(Transform destination)
+    //    if (!_isOccupied)
+    //    {
+    //        EnterBarrel(playerObject);
+    //    }
+    //}
+
+    private void StartMovePlayer(Vector3 position)
     {
-        _player.transform.position = destination.position;
-        _player.transform.rotation = destination.rotation;
+        if (PhotonNetwork.OfflineMode)
+            _player.transform.position = position;
+
+        else
+            photonView.RPC("RPC_MovePlayer", RpcTarget.All, position.x, position.y, position.y);
+
     }
-    private void EnterBarrel(GameObject playerObject)
+    [PunRPC]
+    private void RPC_MovePlayer(int positionX, int positionY, int positionZ)
+    {
+        _player.transform.position = new Vector3(positionX, positionY, positionZ);
+    }
+
+    private void EnterBarrel(GameObject player)
     {
         OnEnable();
         //move player character
-        _player = playerObject;
-        MovePlayer(transform);
+        _player = player;
+        StartMovePlayer(transform.position);
         PlayerController playerController = _player.GetComponent<PlayerController>();
 
         _isOccupied = true;
 
         //disable player control
-        playerController.StartToggleCharacterActive();
+        playerController.ToggleCharacterActive();
 
         playerController.SwitchActiveCam(_peekCam);
     }
+
     void ExitBarrel()
     {
         if (_exitTransform != null)
         {
-            MovePlayer(_exitTransform);
+            StartMovePlayer(_exitTransform.position);
 
             _isOccupied = false;
             PlayerController playerController = _player.GetComponent<PlayerController>();
 
-            playerController.StartToggleCharacterActive();
+            playerController.ToggleCharacterActive();
 
             playerController.SwitchActiveCam(_peekCam);
 
