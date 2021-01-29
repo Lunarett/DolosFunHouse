@@ -122,7 +122,6 @@ public class BarrelScript : Interactible
         //we receive a Vector 2 where x is the horizontal and y the vertical movement of the mouse over time (delta)
         float moveX = mouseInput.x * _mouseSensitivity * Time.deltaTime;
 
-
         _yRotation = Mathf.Clamp(_yRotation + moveX, -_yRotClamp, _yRotClamp);
 
         _peekCam.gameObject.transform.Rotate(Vector3.up * _yRotation * Time.deltaTime);

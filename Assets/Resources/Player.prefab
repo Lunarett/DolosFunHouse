@@ -5161,7 +5161,6 @@ MonoBehaviour:
     m_Bits: 257
   _animator: {fileID: 7211988748970639758}
   _playerUI: {fileID: 5940851922414099970}
-  myName: 
   _skinsParent: {fileID: 7211988748628192864}
 --- !u!95 &7211988748970639758
 Animator:
