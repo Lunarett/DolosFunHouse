@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
 
     //character controller
-    private CharacterController controller;
+    private CharacterController _characterController;
 
     //input
     private InputMap _inputMap;
@@ -47,6 +47,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
     //animation
     [SerializeField] private Animator _animator;
 
+    //UI
+    [SerializeField] PlayerUIHandler _playerUI;
 
     //test
     [SerializeField] private string myName;
@@ -55,14 +57,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
     {
         if (!photonView.IsMine)
         {
-            Debug.Log("This isn't " + photonView.Owner.NickName);
             return;
         }
 
         _playerCam.gameObject.SetActive(true);
         _virtualCam.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
-        controller = gameObject.GetComponent<CharacterController>();
+        _characterController = gameObject.GetComponent<CharacterController>();
 
         myName = photonView.Owner.NickName;
     }
@@ -83,18 +84,29 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
         if (_playerCam.gameObject.activeSelf)
         {
-            //Ray ray = new Ray(_followTransform.position, _followTransform.forward * _maxInsteractDistance);
             Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
 
             //ray cast will ignore everything on the player layer because of the ~
             if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, ~_playerLayer))
             {
-                if (hit.distance <= _maxInsteractDistance && hit.transform.CompareTag("Selectable"))
+                if (hit.distance <= _maxInsteractDistance)
                 {
-                    //show UI
-                    //....
-                    RemoveHighlight();
-                    ApplyHighlight(hit);
+                    if (hit.transform.CompareTag("Selectable"))
+                    {
+                        ApplyHighlight(hit);
+                    }
+                    else if (hit.transform.CompareTag("Player"))
+                    {
+                        _playerUI.SelectedCrosshair();
+                    }
+                    else
+                    {
+                        _playerUI.NormalCrosshair();
+                    }
+                }
+                else
+                {
+                    _playerUI.NormalCrosshair();
                 }
             }
         }
@@ -126,7 +138,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
             if (_isSprinting)
             {
-                controller.Move(move * _movementSpeed * _sprintModifier * Time.deltaTime);
+                _characterController.Move(move * _movementSpeed * _sprintModifier * Time.deltaTime);
 
                 if (!_isJumping)
                 {
@@ -136,7 +148,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
             }
             else
             {
-                controller.Move(move * _movementSpeed * Time.deltaTime);
+                _characterController.Move(move * _movementSpeed * Time.deltaTime);
 
                 if (!_isJumping)
                 {
@@ -161,11 +173,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
     private void InitInput()
     {
         _inputMap = new InputMap();
+
+        //is survivor
         _inputMap.Player.Movement.performed += context => Move();
         _inputMap.Player.Jump.performed += context => StartJump();
         _inputMap.Player.Interact.performed += context => StartInteract();
         _inputMap.Player.Sprint.performed += context => StartSprint();
         _inputMap.Player.Sprint.canceled += context => StartSprint();
+
+        //is killer
+        //...
+        _inputMap.Killer.Kill.performed += context => Kill();
     }
 
     private void ApplyHighlight(RaycastHit hit)
@@ -178,6 +196,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         {
             _defaultMaterial = _selectionRenderer.material;
             _selectionRenderer.material = _highlightMaterial;
+
+            _playerUI.SelectedCrosshair();
         }
     }
 
@@ -188,6 +208,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
             _selectionRenderer.material = _defaultMaterial;
             _selection = null;
             _selectionRenderer = null;
+
+            _playerUI.NormalCrosshair();
         }
     }
 
@@ -216,18 +238,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         _playerCam.gameObject.SetActive(!_playerCam.gameObject.activeSelf);
         otherCam.gameObject.SetActive(!otherCam.gameObject.activeSelf);
     }
-
-    //private void StartMove()
-    //{
-    //    photonView.RPC("RPC_Move", RpcTarget.All);
-    //}
-
-    //[PunRPC]
-    //private void RPC_Move()
-    //{
-
-    //    _isMoving = !_isMoving;
-    //}
 
     private void Move()
     {
@@ -282,19 +292,24 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
     private void StartApplyGravity()
     {
-        photonView.RPC("RPC_ApplyGravity", RpcTarget.All);
+        if (photonView.IsMine)
+            photonView.RPC("RPC_ApplyGravity", RpcTarget.All);
     }
     [PunRPC]
     private void RPC_ApplyGravity()
     {
-        _velocity += _gravity * Time.deltaTime;
-        // probably causes an error
-        controller.Move(_velocity * Time.deltaTime);
-
-        if (_isGrounded && _velocity.y < 0)
+        if (photonView.IsMine)
         {
-            _velocity.y = 0;
+            _velocity += _gravity * Time.deltaTime;
+            // probably causes an error
+            _characterController.Move(_velocity * Time.deltaTime);
+
+            if (_isGrounded && _velocity.y < 0)
+            {
+                _velocity.y = 0;
+            }
         }
+
     }
 
     private void OnEnable()
@@ -333,12 +348,54 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
 
     }
 
-    //so here we give the PhotonPlayer the gameObject as TagObject so that we can get the gameObject through the viewActorNumber later
+    //here we give the PhotonPlayer the gameObject as TagObject so that we can get the player gameObject through the viewActorNumber later
     //some links:
     //https://forum.photonengine.com/discussion/12564/pun-2-onphotoninstantiate-isnt-being-called
     //https://forum.photonengine.com/discussion/6432/tagobject-usage
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         info.Sender.TagObject = gameObject;
+    }
+
+    private void Kill()
+    {
+        if (_playerCam.gameObject.activeSelf)
+        {
+            Ray ray = new Ray(_playerCam.transform.position, _followTransform.forward * _maxInsteractDistance);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, _maxInsteractDistance, _playerLayer))
+            {
+                if (hit.distance <= _maxInsteractDistance && hit.transform.CompareTag("Player"))
+                {
+                    Debug.Log("Kill Player");
+                    //since we might hit different parts of the player we first go to the parent and then search it's children. 
+                    //This way we also find the controller when it is in a sibling
+                    PlayerController victimController = hit.transform.gameObject.GetComponent<PlayerController>();
+
+                    //this is if we hit the player from the front, the ray will hit the physical interaction zone
+                    if(victimController == null)
+                    {
+                        victimController = hit.transform.GetComponentInParent<PlayerController>();
+                    }
+
+                    if(victimController != this)
+                    {
+                        victimController.StartDie();
+                    }
+                }
+            }
+        }
+    }
+
+    public void StartDie()
+    {
+        
+            photonView.RPC("RPC_Die", RpcTarget.All);
+    }
+    [PunRPC]
+    private void RPC_Die()
+    {
+
+        Debug.Log("Oh no I just died!!!");
     }
 }
