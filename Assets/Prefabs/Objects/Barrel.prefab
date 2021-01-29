@@ -105,7 +105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _exitTransform: {fileID: 1344691092976783006}
   _peekCam: {fileID: 1344691093901612571}
-  _mouseSensitivity: 50
+  _mouseSensitivity: 5
   _yRotClamp: 90
 --- !u!114 &7123930727056121993
 MonoBehaviour:
@@ -125,7 +125,8 @@ MonoBehaviour:
   observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 0
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 1344691092761532349}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
