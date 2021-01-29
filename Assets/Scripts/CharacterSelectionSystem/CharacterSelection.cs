@@ -43,8 +43,6 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
             _clients[i].Setup(PhotonNetwork.CurrentRoom.Players[i + 1].NickName, i);
         }
 
-        
-
         PlayAsSurvivor();
     }
 
@@ -130,15 +128,7 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
 
     public void StartGame()
     {
-        if (_isSurvivor || _isKiller)
-        {
-            PlayerPrefs.SetInt("selectedCharacter", _selectedCharacter);
-            SceneManager.LoadScene(2, LoadSceneMode.Single);
-        }
-        else
-        {
-            Debug.Log("No faction was selected");
-        }
+        PhotonNetwork.LoadLevel(2);
     }
 
     public void ToggleReady()
@@ -152,6 +142,7 @@ public class CharacterSelection : MonoBehaviour, IOnEventCallback
         {
             _isReady = true;
             _isReadyButton.GetComponentInChildren<TMP_Text>().text = "Not ready";
+            PlayerPrefs.SetInt("selectedCharacter", _selectedCharacter);
         }
 
         object[] content = new object[2]
