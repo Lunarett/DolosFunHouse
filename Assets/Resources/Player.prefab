@@ -5136,7 +5136,7 @@ MonoBehaviour:
   _playerCam: {fileID: 7211988749032452541}
   _virtualCam: {fileID: 7211988748355484500}
   _followTransform: {fileID: 7211988748235639952}
-  _playerCamController: {fileID: 0}
+  _playerCamController: {fileID: 7211988749032452539}
   _movementSpeed: 4
   _jumpHeight: 2
   _groundCheck: {fileID: 4345396818131194180}
