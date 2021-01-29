@@ -53,7 +53,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
     //test
     [SerializeField] private string myName;
 
-    private void Start()
     [SerializeField] private GameObject _skinsParent;
 
     private void Awake()
@@ -69,10 +68,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
         _characterController = gameObject.GetComponent<CharacterController>();
 
         myName = photonView.Owner.NickName;
-    }
 
-    private void Awake()
-    {
         InitInput();
     }
 
@@ -86,7 +82,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable, IPunInstantiat
             Debug.Log("Found skin" + playerPref);
         }
     }
-
     [PunRPC]
     private void RPC_SetSkin(int index)
     {
